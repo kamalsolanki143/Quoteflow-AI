@@ -1,0 +1,83 @@
+================================================================================
+                        REQUEST FOR QUOTATION (RFQ)
+================================================================================
+
+Date        : 07 June 2026
+RFQ Number  : RFQ/2026/NXT-4581
+Valid Until  : 21 June 2026
+
+--------------------------------------------------------------------------------
+FROM
+--------------------------------------------------------------------------------
+Company     : NexaTech Solutions Pvt. Ltd.
+Address     : 12th Floor, Cyber Tower, HITEC City, Hyderabad 500081, India
+Contact     : Arjun Mehta — Senior Procurement Manager
+Email       : arjun.mehta@nexatechsolutions.in
+Phone       : +91 40 6789 1234
+
+--------------------------------------------------------------------------------
+TO
+--------------------------------------------------------------------------------
+Company     : QuoteFlow AI Distribution
+Address     : B-304, Millennium Business Park, Sector 62, Noida 201301, India
+
+--------------------------------------------------------------------------------
+SUBJECT
+--------------------------------------------------------------------------------
+Supply of IT Equipment for New Office Setup — NexaTech Hyderabad Expansion
+
+--------------------------------------------------------------------------------
+ITEMS REQUESTED
+--------------------------------------------------------------------------------
+
+   Sr.  | Product                | Quantity | Specifications / Notes
+  ------|------------------------|----------|-------------------------------
+    1   | HP Laptop              |    50    | 15.6" FHD, i5 12th Gen, 16 GB RAM, 512 GB SSD
+    2   | Dell Monitor           |    20    | 27" 4K IPS, USB-C preferred
+    3   | Canon Printer          |    60    | Colour laser MFP with duplex & Wi-Fi
+    4   | Lenovo ThinkPad        |    15    | T14 series, Ryzen 7, 16 GB RAM
+    5   | Wireless Office Keyboard|   80    | MX Keys or equivalent wireless
+    6   | Cisco Router           |     5    | Enterprise grade ISR router
+
+--------------------------------------------------------------------------------
+TERMS & CONDITIONS
+--------------------------------------------------------------------------------
+
+1. Delivery Location  : NexaTech Solutions, HITEC City, Hyderabad
+2. Delivery Timeline  : Within 15 business days from Purchase Order date
+3. Payment Terms      : Net 30 days from invoice date
+4. Warranty           : Manufacturer standard warranty required
+5. Quotation Validity : Minimum 14 days from date of issue
+6. Packaging          : Original manufacturer packaging with proper labelling
+7. Insurance          : Seller to arrange transit insurance
+
+--------------------------------------------------------------------------------
+ADDITIONAL NOTES
+--------------------------------------------------------------------------------
+
+- Please provide unit price, total price, and applicable taxes (GST) separately.
+- Volume discounts, if any, should be mentioned clearly.
+- Partial fulfilment is acceptable; please indicate stock availability.
+- Preferred brands and specifications are listed above; equivalent
+  alternatives may be proposed with justification.
+- NOTE: If any requested product is out of stock or unavailable, please
+  propose suitable alternative products.
+
+--------------------------------------------------------------------------------
+SUBMISSION INSTRUCTIONS
+--------------------------------------------------------------------------------
+
+Please submit your quotation to:
+  Email : procurement@nexatechsolutions.in
+  CC    : arjun.mehta@nexatechsolutions.in
+
+Deadline for submission: 14 June 2026, 5:00 PM IST
+
+================================================================================
+We look forward to your competitive offer.
+
+Warm regards,
+Arjun Mehta
+Senior Procurement Manager
+NexaTech Solutions Pvt. Ltd.
+================================================================================
