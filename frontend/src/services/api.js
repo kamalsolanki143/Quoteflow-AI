@@ -33,6 +33,8 @@ const API_ENDPOINTS = {
   RFQ_UPLOAD: "/api/v1/rfq/upload",
   QUOTE_GENERATE: "/api/v1/quote/generate",
   INVENTORY: "/api/v1/inventory",
+  APPROVE_QUOTE: "/api/v1/quote/approve",
+  REJECT_QUOTE: "/api/v1/quote/reject",
 };
 
 // ---------------------------------------------------------------------------
@@ -161,6 +163,33 @@ export const generateQuote = (rfqData) =>
  * @returns {Promise<import("axios").AxiosResponse>}
  */
 export const getInventory = () => withRetry(() => apiClient.get(API_ENDPOINTS.INVENTORY));
+
+/**
+ * Approve Quotation
+ * POST /api/v1/quote/approve
+ *
+ * Marks a generated quotation as approved.
+ *
+ * @param {Object} payload - The approval payload
+ * @param {string} payload.quote_id - The ID of the quote to approve
+ * @returns {Promise<import("axios").AxiosResponse>}
+ */
+export const approveQuote = (payload) =>
+  apiClient.post(API_ENDPOINTS.APPROVE_QUOTE, payload);
+
+/**
+ * Reject Quotation
+ * POST /api/v1/quote/reject
+ *
+ * Marks a generated quotation as rejected.
+ *
+ * @param {Object} payload - The rejection payload
+ * @param {string} payload.quote_id - The ID of the quote to reject
+ * @param {string} payload.reason - The reason for rejection
+ * @returns {Promise<import("axios").AxiosResponse>}
+ */
+export const rejectQuote = (payload) =>
+  apiClient.post(API_ENDPOINTS.REJECT_QUOTE, payload);
 
 // ---------------------------------------------------------------------------
 // Default export — the configured Axios instance for ad-hoc requests

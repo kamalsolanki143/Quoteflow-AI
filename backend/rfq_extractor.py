@@ -1,6 +1,7 @@
 import os
 import json
 from google import genai
+# pyrefly: ignore [missing-import]
 from google.genai import types
 from dotenv import load_dotenv
 
@@ -267,8 +268,13 @@ Output:
   "notes": "Delivery to construction site. All fields present."
 }"""
 
-def clean_nulls(obj):
-    # converts "null" strings to actual None recursively
+from typing import Any, Dict, List, Optional, Union
+
+def clean_nulls(obj: Any) -> Any:
+    """
+    Recursively traverse a dictionary or list and convert string "null" or "None" 
+    or empty strings to actual Python None types to ensure JSON serialization is clean.
+    """
     if isinstance(obj, dict):
         return {k: clean_nulls(v) for k, v in obj.items()}
     elif isinstance(obj, list):

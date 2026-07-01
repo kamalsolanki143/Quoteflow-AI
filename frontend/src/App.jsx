@@ -486,10 +486,8 @@ export default function App() {
         ],
       };
 
-      const extractedItems = uploadRes.data.extracted_items
-        ? (Array.isArray(uploadRes.data.extracted_items)
-            ? { rfq_id: uploadRes.data.rfq_id, items: uploadRes.data.extracted_items }
-            : uploadRes.data.extracted_items)
+      const extractedItems = uploadRes.data.items
+        ? { rfq_id: uploadRes.data.rfq_id, items: uploadRes.data.items }
         : sampleItems;
 
       const quoteRes = await generateQuote(extractedItems);
