@@ -6,6 +6,8 @@ from google.genai import types
 from dotenv import load_dotenv
 
 load_dotenv()
+print("API KEY FOUND:", bool(os.getenv("GEMINI_API_KEY")))
+print("API KEY PREFIX:", os.getenv("GEMINI_API_KEY", "")[:10])
 
 SYSTEM_PROMPT = """You are an AI procurement assistant for an Indian B2B multi-industry 
 distribution company. Your sole job is to extract structured data from 
@@ -334,7 +336,7 @@ def extract_rfq(rfq_text: str) -> dict:
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash-lite",
+            model="gemini-2.5-flash",
             contents=rfq_text,
             config=generate_content_config,
         )
@@ -344,4 +346,8 @@ def extract_rfq(rfq_text: str) -> dict:
     except json.JSONDecodeError:
         return {"error": "Failed to parse response", "raw": response.text}
     except Exception as e:
-        return {"error": str(e)}
+        print("Gemini Error:", repr(e))
+        return {
+            "success": False,
+            "error": str(e)
+        }
