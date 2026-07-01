@@ -1,0 +1,203 @@
+{
+  "metadata": {
+    "database": "QuoteFlow AI — Product Inventory",
+    "version": "2.0.0",
+    "inventory_version": "2026-Q2-MVP",
+    "last_updated": "2026-06-07T05:00:00Z",
+    "currency": "INR",
+    "description": "Mock inventory database for the FlowZint AI Hackathon 2026 MVP.",
+    "owner": "QuoteFlow AI Team",
+    "environment": "hackathon-mvp"
+  },
+
+  "summary": {
+    "total_products": 5,
+    "total_categories": 4,
+    "currency": "INR",
+    "categories": ["Laptops", "Monitors", "Printers", "Peripherals"],
+    "total_stock_units": 490,
+    "total_inventory_value": 16991210.00,
+    "average_product_price": 43098.20,
+    "last_updated": "2026-06-07T05:00:00Z",
+    "stock_overview": {
+      "in_stock": 5,
+      "low_stock": 0,
+      "out_of_stock": 0
+    }
+  },
+
+  "validation_rules": {
+    "max_quote_quantity": 500,
+    "default_currency": "INR",
+    "gst_rate": 0.18,
+    "quote_validity_days": 7,
+    "max_revision_cycles": 3,
+    "low_stock_threshold_logic": "stock <= reorder_level AND stock > 0",
+    "out_of_stock_logic": "stock == 0",
+    "in_stock_logic": "stock > reorder_level",
+    "supported_file_types": ["application/pdf", "text/plain"]
+  },
+
+  "products": [
+    {
+      "id": 1,
+      "name": "HP Laptop",
+      "sku": "HP-LPT-15-2026",
+      "category": "Laptops",
+      "description": "HP 15s, 12th Gen Intel Core i5, 16 GB RAM, 512 GB SSD, 15.6\" FHD",
+      "unit_price": 52999.00,
+      "stock": 120,
+      "status": "in_stock",
+      "reorder_level": 20,
+      "is_active": true,
+      "is_featured": true,
+      "min_order_qty": 1,
+      "lead_time_days": 3,
+      "warranty_months": 12,
+      "brand": "HP",
+      "supplier": {
+        "name": "HP India Pvt. Ltd.",
+        "contact": "b2b-orders@hp.co.in",
+        "location": "Bengaluru, India"
+      },
+      "searchable_keywords": [
+        "hp laptop", "hp notebook", "hp 15s", "laptop", "hp i5 laptop",
+        "hp business laptop", "hp 15.6 inch", "hewlett packard laptop"
+      ],
+      "ai_metadata": {
+        "common_aliases": ["HP 15s", "HP Notebook 15", "HP Laptop 15"],
+        "procurement_category": "IT Equipment — Portable Computing",
+        "confidence_keywords": ["hp", "laptop", "notebook", "15s", "i5", "512 ssd"]
+      },
+      "tags": ["laptop", "hp", "business", "portable"]
+    },
+    {
+      "id": 2,
+      "name": "Dell Monitor",
+      "sku": "DELL-MON-27-4K",
+      "category": "Monitors",
+      "description": "Dell UltraSharp U2723QE, 27\" 4K IPS, USB-C Hub, 90 W PD",
+      "unit_price": 38499.00,
+      "stock": 75,
+      "status": "in_stock",
+      "reorder_level": 15,
+      "is_active": true,
+      "is_featured": true,
+      "min_order_qty": 1,
+      "lead_time_days": 5,
+      "warranty_months": 36,
+      "brand": "Dell",
+      "supplier": {
+        "name": "Dell Technologies India",
+        "contact": "enterprise-sales@dell.co.in",
+        "location": "Hyderabad, India"
+      },
+      "searchable_keywords": [
+        "dell monitor", "dell 4k monitor", "dell ultrasharp", "27 inch monitor",
+        "dell display", "usb-c monitor", "dell u2723qe", "4k display"
+      ],
+      "ai_metadata": {
+        "common_aliases": ["Dell UltraSharp 27", "Dell 4K Display", "Dell U2723QE"],
+        "procurement_category": "IT Equipment — Display & Visual",
+        "confidence_keywords": ["dell", "monitor", "ultrasharp", "4k", "27 inch", "usb-c"]
+      },
+      "tags": ["monitor", "dell", "4k", "ultrasharp"]
+    },
+    {
+      "id": 3,
+      "name": "Canon Printer",
+      "sku": "CANON-PRN-MF645",
+      "category": "Printers",
+      "description": "Canon imageCLASS MF645Cx, Colour Laser MFP, Duplex, Wi-Fi, ADF",
+      "unit_price": 34999.00,
+      "stock": 40,
+      "status": "in_stock",
+      "reorder_level": 25,
+      "is_active": true,
+      "is_featured": false,
+      "min_order_qty": 1,
+      "lead_time_days": 7,
+      "warranty_months": 12,
+      "brand": "Canon",
+      "supplier": {
+        "name": "Canon India Pvt. Ltd.",
+        "contact": "channel-partners@canon.co.in",
+        "location": "Gurugram, India"
+      },
+      "searchable_keywords": [
+        "canon printer", "canon laser printer", "colour printer", "canon mfp",
+        "canon mf645", "multifunction printer", "office printer", "canon imageclass"
+      ],
+      "ai_metadata": {
+        "common_aliases": ["Canon MF645Cx", "Canon Colour Laser", "Canon MFP"],
+        "procurement_category": "IT Equipment — Printing & Imaging",
+        "confidence_keywords": ["canon", "printer", "laser", "mfp", "duplex", "colour"]
+      },
+      "tags": ["printer", "canon", "laser", "multifunction"]
+    },
+    {
+      "id": 4,
+      "name": "Lenovo ThinkPad",
+      "sku": "LEN-TP-T14-G4",
+      "category": "Laptops",
+      "description": "Lenovo ThinkPad T14 Gen 4, AMD Ryzen 7 Pro, 16 GB RAM, 512 GB SSD, 14\" WUXGA",
+      "unit_price": 78999.00,
+      "stock": 55,
+      "status": "in_stock",
+      "reorder_level": 10,
+      "is_active": true,
+      "is_featured": true,
+      "min_order_qty": 1,
+      "lead_time_days": 5,
+      "warranty_months": 36,
+      "brand": "Lenovo",
+      "supplier": {
+        "name": "Lenovo India Technology",
+        "contact": "smb-orders@lenovo.co.in",
+        "location": "Bengaluru, India"
+      },
+      "searchable_keywords": [
+        "lenovo thinkpad", "thinkpad t14", "lenovo laptop", "thinkpad",
+        "lenovo business laptop", "lenovo ryzen laptop", "enterprise laptop"
+      ],
+      "ai_metadata": {
+        "common_aliases": ["ThinkPad T14", "Lenovo T14 Gen 4", "ThinkPad Ryzen"],
+        "procurement_category": "IT Equipment — Enterprise Computing",
+        "confidence_keywords": ["lenovo", "thinkpad", "t14", "ryzen", "enterprise"]
+      },
+      "tags": ["laptop", "lenovo", "thinkpad", "enterprise"]
+    },
+    {
+      "id": 5,
+      "name": "Logitech Keyboard",
+      "sku": "LOG-KB-MX-KEYS",
+      "category": "Peripherals",
+      "description": "Logitech MX Keys S, Wireless Illuminated Keyboard, Bluetooth & USB, Backlit",
+      "unit_price": 9995.00,
+      "stock": 200,
+      "status": "in_stock",
+      "reorder_level": 30,
+      "is_active": true,
+      "is_featured": false,
+      "min_order_qty": 5,
+      "lead_time_days": 2,
+      "warranty_months": 24,
+      "brand": "Logitech",
+      "supplier": {
+        "name": "Logitech India",
+        "contact": "distribution@logitech.co.in",
+        "location": "Mumbai, India"
+      },
+      "searchable_keywords": [
+        "logitech keyboard", "mx keys", "wireless keyboard", "logitech mx keys s",
+        "bluetooth keyboard", "backlit keyboard", "office keyboard"
+      ],
+      "ai_metadata": {
+        "common_aliases": ["MX Keys S", "Logitech MX Keys", "Logitech Wireless KB"],
+        "procurement_category": "IT Equipment — Peripherals & Accessories",
+        "confidence_keywords": ["logitech", "keyboard", "mx keys", "wireless", "bluetooth"]
+      },
+      "tags": ["keyboard", "logitech", "wireless", "peripheral"]
+    }
+  ]
+}
