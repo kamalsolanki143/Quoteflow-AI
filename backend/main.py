@@ -66,12 +66,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",   # React dev server (CRA)
-        "http://localhost:5173",   # React dev server (Vite)
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -237,3 +232,14 @@ async def on_startup():
 # ---------------------------------------------------------------------------
 # Run with: uvicorn backend.main:app --reload
 # ---------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    import uvicorn
+    from dotenv import load_dotenv
+    load_dotenv()
+    
+    port = int(os.getenv("PORT", 8000))
+    host = os.getenv("HOST", "0.0.0.0")
+    
+    logger.info("Starting server on %s:%s", host, port)
+    uvicorn.run("backend.main:app", host=host, port=port, reload=os.getenv("RELOAD", "false").lower() == "true")
