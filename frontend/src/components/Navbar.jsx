@@ -1,89 +1,200 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
+import './Navbar.css';
 
 /**
  * Navbar Component
- * Renders the top navigation bar matching the dark navy style in the mockups.
- * 
+ * Renders a premium corporate header with responsiveness and API health checks.
+ *
  * Props:
- *  - healthStatus: "checking" | "healthy" | "offline"
+ *  - healthStatus: 'checking' | 'healthy' | 'offline'
  */
-export default function Navbar({ healthStatus }) {
-  const [isOpen, setIsOpen] = useState(false);
+const Navbar = ({ healthStatus = 'checking' }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeLink, setActiveLink] = useState('Home');
 
-  const getStatusColor = () => {
-    if (healthStatus === "healthy") return "#4CAF50"; // Green
-    if (healthStatus === "offline") return "#F44336"; // Red
-    return "#FFC107"; // Yellow/Checking
+  const navLinks = [
+    { name: 'Home', href: '#home' },
+    { name: 'Upload RFQ', href: '#upload' },
+    { name: 'Inventory Catalog', href: '#inventory' },
+    { name: 'Quotation Portal', href: '#quote' },
+    { name: 'Workflow', href: '#workflow' }
+  ];
+
+  // Prevent background scrolling when mobile menu is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMenuOpen]);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
   };
 
-  const getStatusText = () => {
-    if (healthStatus === "healthy") return "API Online";
-    if (healthStatus === "offline") return "API Offline";
-    return "Checking API...";
+  const handleLinkClick = (name, href) => {
+    setActiveLink(name);
+    setIsMenuOpen(false);
+    
+    // Smooth scroll for anchors
+    const targetId = href.replace('#', '');
+    const element = document.getElementById(targetId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
+
+  const getStatusDetails = () => {
+    switch (healthStatus) {
+      case 'healthy':
+        return { text: 'API Online', class: 'status-healthy' };
+      case 'offline':
+        return { text: 'API Offline', class: 'status-offline' };
+      default:
+        return { text: 'Checking API...', class: 'status-checking' };
+    }
+  };
+
+  const status = getStatusDetails();
 
   return (
-    <nav className="navbar">
-      <div className="navbar-container">
-        <a href="#" className="navbar-logo" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          QuoteFlow AI
-        </a>
-
-        {/* Hamburger button for mobile responsiveness */}
-        <button 
-          className="navbar-toggle" 
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="Toggle navigation menu"
-        >
-          <span className="navbar-icon-bar"></span>
-          <span className="navbar-icon-bar"></span>
-          <span className="navbar-icon-bar"></span>
-        </button>
-
-        <div className={`navbar-menu-wrapper ${isOpen ? "open" : ""}`}>
-          <ul className="navbar-links">
-            <li>
-              <a href="#" className="navbar-link" onClick={() => setIsOpen(false)}>
-                Home
-              </a>
-            </li>
-            <li>
-              <a href="#workflow" className="navbar-link" onClick={() => setIsOpen(false)}>
-                Workflow
-              </a>
-            </li>
-            <li>
-              <a href="#upload" className="navbar-link" onClick={() => setIsOpen(false)}>
-                Upload
-              </a>
-            </li>
-            <li>
-              <a href="#inventory" className="navbar-link" onClick={() => setIsOpen(false)}>
-                Dashboard
-              </a>
-            </li>
-            <li>
-              <a href="#footer" className="navbar-link" onClick={() => setIsOpen(false)}>
-                About
-              </a>
-            </li>
-          </ul>
-
-          {/* Health Status Indicator (retained from original functionality) */}
-          <div className="navbar-status">
-            <span 
-              className="navbar-status-dot" 
-              style={{ 
-                backgroundColor: getStatusColor(),
-                boxShadow: `0 0 6px ${getStatusColor()}` 
-              }} 
-            />
-            <span className="navbar-status-text" style={{ color: getStatusColor() }}>
-              {getStatusText()}
+    <header className="quoteflow-navbar-wrapper">
+      <div className="quoteflow-navbar-container">
+        {/* Left Section: Logo & Name */}
+        <div className="quoteflow-navbar-left">
+          <a 
+            href="#home" 
+            className="quoteflow-logo-link" 
+            aria-label="QuoteFlow AI Home"
+            onClick={(e) => {
+              e.preventDefault();
+              handleLinkClick('Home', '#home');
+            }}
+          >
+            <div className="quoteflow-logo-icon-wrapper">
+              <svg 
+                className="quoteflow-logo-icon" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="var(--primary)" stroke="var(--primary)" strokeWidth="2" strokeLinejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="var(--primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="var(--primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <span className="quoteflow-project-name">
+              QuoteFlow <span className="logo-accent">AI</span>
             </span>
+          </a>
+        </div>
+
+        {/* Middle Section: Desktop Navigation */}
+        <nav className="quoteflow-navbar-middle" aria-label="Main Navigation">
+          <ul className="quoteflow-nav-links">
+            {navLinks.map((link) => (
+              <li key={link.name}>
+                <a
+                  href={link.href}
+                  className={`quoteflow-nav-item ${activeLink === link.name ? 'is-active' : ''}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleLinkClick(link.name, link.href);
+                  }}
+                >
+                  {link.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* Right Section: Health Status & Hamburger */}
+        <div className="quoteflow-navbar-right">
+          {/* API Status Indicator */}
+          <div className={`quoteflow-health-badge ${status.class}`} title="FastAPI Backend Health Status">
+            <span className="status-dot"></span>
+            <span className="status-text">{status.text}</span>
           </div>
+
+          <button 
+            className="quoteflow-cta-btn" 
+            aria-label="Start Demo"
+            onClick={() => handleLinkClick('Upload RFQ', '#upload')}
+          >
+            Get Started
+          </button>
+          
+          {/* Mobile Hamburger Menu Toggle */}
+          <button 
+            className={`quoteflow-hamburger ${isMenuOpen ? 'is-open' : ''}`}
+            onClick={toggleMenu}
+            aria-expanded={isMenuOpen}
+            aria-label="Toggle navigation menu"
+            aria-controls="quoteflow-mobile-drawer"
+          >
+            <span className="hamburger-line"></span>
+            <span className="hamburger-line"></span>
+            <span className="hamburger-line"></span>
+          </button>
         </div>
       </div>
-    </nav>
+
+      {/* Animated Mobile Drawer Overlay */}
+      {isMenuOpen && (
+        <div 
+          className="quoteflow-drawer-overlay is-visible" 
+          onClick={toggleMenu}
+        />
+      )}
+
+      {/* Animated Mobile Drawer */}
+      <div 
+        id="quoteflow-mobile-drawer"
+        className={`quoteflow-mobile-drawer ${isMenuOpen ? 'is-open' : ''}`}
+        aria-hidden={!isMenuOpen}
+      >
+        <nav className="quoteflow-mobile-nav" aria-label="Mobile Navigation">
+          <ul className="quoteflow-mobile-links">
+            {navLinks.map((link) => (
+              <li key={link.name}>
+                <a
+                  href={link.href}
+                  className={`quoteflow-mobile-item ${activeLink === link.name ? 'is-active' : ''}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleLinkClick(link.name, link.href);
+                  }}
+                  tabIndex={isMenuOpen ? 0 : -1}
+                >
+                  {link.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+          
+          <div className="quoteflow-mobile-footer">
+            <div className={`quoteflow-health-badge mobile-badge ${status.class}`}>
+              <span className="status-dot"></span>
+              <span className="status-text">{status.text}</span>
+            </div>
+            
+            <button 
+              className="quoteflow-cta-btn mobile-fullwidth"
+              tabIndex={isMenuOpen ? 0 : -1}
+              onClick={() => handleLinkClick('Upload RFQ', '#upload')}
+            >
+              Get Started
+            </button>
+          </div>
+        </nav>
+      </div>
+    </header>
   );
-}
+};
+
+export default Navbar;

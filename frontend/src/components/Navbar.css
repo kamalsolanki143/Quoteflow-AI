@@ -1,0 +1,320 @@
+/* Navbar Wrapper & Container */
+.quoteflow-navbar-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
+  transition: all var(--transition-fast);
+}
+
+.quoteflow-navbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  height: 72px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Left Brand Section */
+.quoteflow-navbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.quoteflow-logo-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.quoteflow-logo-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.quoteflow-logo-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.quoteflow-project-name {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.quoteflow-project-name .logo-accent {
+  color: var(--primary);
+}
+
+/* Middle Navigation Links */
+.quoteflow-navbar-middle {
+  display: flex;
+  align-items: center;
+}
+
+.quoteflow-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  list-style: none;
+}
+
+.quoteflow-nav-item {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  padding: 8px 0;
+  cursor: pointer;
+  position: relative;
+  transition: color var(--transition-fast);
+}
+
+.quoteflow-nav-item:hover {
+  color: var(--primary);
+}
+
+.quoteflow-nav-item.is-active {
+  color: var(--primary);
+  font-weight: 650;
+}
+
+.quoteflow-nav-item.is-active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--primary);
+  border-radius: var(--radius-round);
+}
+
+/* Right Section - CTA & Health badge */
+.quoteflow-navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* API Status Indicator Badge */
+.quoteflow-health-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: var(--radius-round);
+  font-size: 12px;
+  font-weight: 600;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-fast);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-text {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+/* Health Status Modifiers */
+.status-healthy {
+  background-color: var(--success-light);
+  border-color: var(--success-border);
+}
+.status-healthy .status-dot {
+  background-color: var(--success);
+  box-shadow: 0 0 8px var(--success);
+  animation: pulse 2s infinite;
+}
+.status-healthy .status-text {
+  color: var(--success);
+}
+
+.status-warning {
+  background-color: var(--warning-light);
+  border-color: var(--warning-border);
+}
+.status-warning .status-dot {
+  background-color: var(--warning);
+  animation: pulse 1.5s infinite;
+}
+.status-warning .status-text {
+  color: var(--warning);
+}
+
+.status-offline {
+  background-color: var(--danger-light);
+  border-color: var(--danger-border);
+}
+.status-offline .status-dot {
+  background-color: var(--danger);
+  box-shadow: 0 0 8px var(--danger);
+}
+.status-offline .status-text {
+  color: var(--danger);
+}
+
+.quoteflow-cta-btn {
+  font-size: 13px;
+  font-weight: 600;
+  background-color: var(--primary);
+  color: var(--bg-primary);
+  border: none;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.quoteflow-cta-btn:hover {
+  background-color: var(--primary-hover);
+  box-shadow: 0 4px 10px rgba(37, 99, 255, 0.12);
+}
+
+/* Hamburger Icon styling */
+.quoteflow-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 20px;
+  height: 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 110;
+}
+
+.hamburger-line {
+  width: 100%;
+  height: 2px;
+  background-color: var(--text-primary);
+  border-radius: var(--radius-round);
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.quoteflow-hamburger.is-open .hamburger-line:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.quoteflow-hamburger.is-open .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.quoteflow-hamburger.is-open .hamburger-line:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* Mobile Drawer Overlay */
+.quoteflow-drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.3);
+  backdrop-filter: blur(4px);
+  z-index: 104;
+}
+
+/* Mobile Drawer */
+.quoteflow-mobile-drawer {
+  position: fixed;
+  top: 72px;
+  right: 0;
+  width: 280px;
+  height: calc(100vh - 72px);
+  background-color: var(--bg-primary);
+  border-left: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+  z-index: 105;
+  transform: translateX(100%);
+  transition: transform var(--transition-normal);
+}
+
+.quoteflow-mobile-drawer.is-open {
+  transform: translateX(0);
+}
+
+.quoteflow-mobile-nav {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: 24px;
+}
+
+.quoteflow-mobile-links {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  list-style: none;
+}
+
+.quoteflow-mobile-item {
+  display: block;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-light);
+  transition: color var(--transition-fast);
+}
+
+.quoteflow-mobile-item:hover,
+.quoteflow-mobile-item.is-active {
+  color: var(--primary);
+}
+
+.quoteflow-mobile-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: auto;
+}
+
+.mobile-badge {
+  justify-content: center;
+  width: 100%;
+}
+
+.mobile-fullwidth {
+  width: 100%;
+  padding: 12px;
+  text-align: center;
+}
+
+/* Responsive Overrides */
+@media (max-width: 960px) {
+  .quoteflow-navbar-middle {
+    display: none;
+  }
+  
+  .quoteflow-hamburger {
+    display: flex;
+  }
+  
+  .quoteflow-navbar-right .quoteflow-cta-btn,
+  .quoteflow-navbar-right .quoteflow-health-badge {
+    display: none;
+  }
+}
