@@ -1,10 +1,13 @@
 import os
 import json
 from google import genai
+# pyrefly: ignore [missing-import]
 from google.genai import types
 from dotenv import load_dotenv
 
 load_dotenv()
+print("API KEY FOUND:", bool(os.getenv("GEMINI_API_KEY")))
+print("API KEY PREFIX:", os.getenv("GEMINI_API_KEY", "")[:10])
 
 SYSTEM_PROMPT = """You are an AI procurement assistant for an Indian B2B multi-industry 
 distribution company. Your sole job is to extract structured data from 
@@ -267,8 +270,13 @@ Output:
   "notes": "Delivery to construction site. All fields present."
 }"""
 
-def clean_nulls(obj):
-    # converts "null" strings to actual None recursively
+from typing import Any, Dict, List, Optional, Union
+
+def clean_nulls(obj: Any) -> Any:
+    """
+    Recursively traverse a dictionary or list and convert string "null" or "None" 
+    or empty strings to actual Python None types to ensure JSON serialization is clean.
+    """
     if isinstance(obj, dict):
         return {k: clean_nulls(v) for k, v in obj.items()}
     elif isinstance(obj, list):
@@ -328,7 +336,7 @@ def extract_rfq(rfq_text: str) -> dict:
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash-lite",
+            model="gemini-2.5-flash",
             contents=rfq_text,
             config=generate_content_config,
         )
@@ -338,4 +346,8 @@ def extract_rfq(rfq_text: str) -> dict:
     except json.JSONDecodeError:
         return {"error": "Failed to parse response", "raw": response.text}
     except Exception as e:
-        return {"error": str(e)}
+        print("Gemini Error:", repr(e))
+        return {
+            "success": False,
+            "error": str(e)
+        }

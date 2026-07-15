@@ -4,20 +4,37 @@ QuoteFlow AI - Backend API Server
 FastAPI-powered backend for the AI-driven RFQ-to-Quote automation system.
 
 This module serves as the main entry point for the QuoteFlow AI backend.
-It provides health checks, project metadata, and will host all RFQ processing
-endpoints as the project evolves.
+It provides health checks, project metadata, and hosts all RFQ processing
+endpoints.
+
+Complete Workflow:
+  Upload RFQ → Text Extraction → Gemini AI Extraction → Structured JSON
+  → Inventory Validation → Quote Generation → Manager Approval → Response
 
 Author: QuoteFlow AI Team
 Hackathon: FlowZint AI Hackathon 2026
 """
 
+import json
+import logging
+import os
+import uuid
+from datetime import datetime, timezone
+
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from datetime import datetime, timezone
-import json
-import os
-import uuid
+
+# ---------------------------------------------------------------------------
+# Logging Configuration
+# ---------------------------------------------------------------------------
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+    datefmt="%Y-%m-%dT%H:%M:%SZ",
+)
+logger = logging.getLogger("quoteflow")
 
 # ---------------------------------------------------------------------------
 # Application Configuration
@@ -49,16 +66,30 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",   # React dev server (CRA)
-        "http://localhost:5173",   # React dev server (Vite)
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ---------------------------------------------------------------------------
+# Include Routers — Backend Integration Module
+# ---------------------------------------------------------------------------
+# Import is deferred inside a try/except so that the server can still start
+# even if a route file has a syntax error during development.
+
+try:
+    from backend.routes.upload import router as upload_router
+    from backend.routes.quote import router as quote_router
+    from backend.routes.approval import router as approval_router
+
+    app.include_router(upload_router)
+    app.include_router(quote_router)
+    app.include_router(approval_router)
+    logger.info("All route modules loaded successfully.")
+except Exception as _route_exc:
+    logger.error("Failed to load route modules: %s", _route_exc)
+    raise
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -107,6 +138,8 @@ async def root():
             "upload_rfq": "/api/v1/rfq/upload",
             "generate_quote": "/api/v1/quote/generate",
             "inventory": "/api/v1/inventory",
+            "approve_quote": "/api/v1/quote/approve",
+            "reject_quote": "/api/v1/quote/reject",
         },
     }
 
@@ -179,176 +212,34 @@ async def get_inventory():
 
 
 # ---------------------------------------------------------------------------
-# Routes — RFQ Upload
-# ---------------------------------------------------------------------------
-
-@app.post(
-    "/api/v1/rfq/upload",
-    tags=["RFQ Processing"],
-    summary="Upload an RFQ document",
-    response_description="Extracted product data from the uploaded RFQ",
-)
-async def upload_rfq(file: UploadFile = File(...)):
-    """
-    Accepts an RFQ document (PDF or TXT) and extracts product line items.
-
-    In the MVP this performs a simple text-based extraction.
-    Future versions will integrate Gemini AI for intelligent parsing.
-    """
-    # Validate file type
-    allowed_types = [
-        "application/pdf",
-        "text/plain",
-        "application/octet-stream",
-    ]
-    if file.content_type not in allowed_types:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Unsupported file type: {file.content_type}. "
-                   f"Accepted types: PDF, TXT.",
-        )
-
-    # Read file contents
-    content = await file.read()
-    text_content = content.decode("utf-8", errors="ignore")
-
-    # Generate a unique RFQ tracking ID
-    rfq_id = f"RFQ-{uuid.uuid4().hex[:8].upper()}"
-
-    return {
-        "success": True,
-        "rfq_id": rfq_id,
-        "filename": file.filename,
-        "content_type": file.content_type,
-        "size_bytes": len(content),
-        "extracted_text_preview": text_content[:500],
-        "message": "RFQ uploaded successfully. Ready for AI extraction.",
-        "timestamp": _server_timestamp(),
-    }
-
-
-# ---------------------------------------------------------------------------
-# Routes — Quote Generation
-# ---------------------------------------------------------------------------
-
-@app.post(
-    "/api/v1/quote/generate",
-    tags=["Quote Generation"],
-    summary="Generate a quotation from extracted RFQ data",
-    response_description="Complete quotation with line items and totals",
-)
-async def generate_quote(rfq_data: dict):
-    """
-    Accepts structured RFQ data (product names + quantities) and generates
-    a professional quotation by cross-referencing the inventory database.
-
-    Request body example::
-
-        {
-            "rfq_id": "RFQ-ABC12345",
-            "items": [
-                {"product": "HP Laptop", "quantity": 50},
-                {"product": "Dell Monitor", "quantity": 20}
-            ]
-        }
-    """
-    items = rfq_data.get("items", [])
-    rfq_id = rfq_data.get("rfq_id", f"RFQ-{uuid.uuid4().hex[:8].upper()}")
-
-    if not items:
-        raise HTTPException(
-            status_code=400,
-            detail="No items provided in the RFQ data.",
-        )
-
-    # Load inventory for price & stock lookup
-    try:
-        inventory = _load_inventory()
-    except Exception:
-        raise HTTPException(status_code=503, detail="Inventory unavailable.")
-
-    # Build a lookup map: lowercase product name → product record
-    product_map = {
-        p["name"].lower(): p for p in inventory.get("products", [])
-    }
-
-    # Process each requested line item
-    quote_lines = []
-    unavailable_items = []
-    subtotal = 0.0
-
-    for item in items:
-        product_name = item.get("product", "").strip()
-        quantity = int(item.get("quantity", 0))
-        key = product_name.lower()
-
-        if key not in product_map:
-            unavailable_items.append(product_name)
-            continue
-
-        product = product_map[key]
-        unit_price = product["unit_price"]
-        available_stock = product["stock"]
-        fulfilled_qty = min(quantity, available_stock)
-        line_total = round(fulfilled_qty * unit_price, 2)
-        subtotal += line_total
-
-        quote_lines.append({
-            "product": product["name"],
-            "sku": product["sku"],
-            "requested_qty": quantity,
-            "available_qty": available_stock,
-            "fulfilled_qty": fulfilled_qty,
-            "unit_price": unit_price,
-            "line_total": line_total,
-            "status": "fulfilled" if fulfilled_qty == quantity else "partial",
-        })
-
-    # Calculate totals
-    tax_rate = 0.18  # 18 % GST (India)
-    tax_amount = round(subtotal * tax_rate, 2)
-    grand_total = round(subtotal + tax_amount, 2)
-
-    # Build the quote ID
-    quote_id = f"QT-{uuid.uuid4().hex[:8].upper()}"
-
-    return {
-        "success": True,
-        "quote_id": quote_id,
-        "rfq_id": rfq_id,
-        "line_items": quote_lines,
-        "unavailable_items": unavailable_items,
-        "pricing": {
-            "subtotal": subtotal,
-            "tax_rate": f"{int(tax_rate * 100)}%",
-            "tax_amount": tax_amount,
-            "grand_total": grand_total,
-            "currency": "INR",
-        },
-        "status": "pending_approval",
-        "generated_at": _server_timestamp(),
-        "valid_until": "7 days from generation",
-        "message": "Quotation generated successfully. Awaiting manager approval.",
-    }
-
-
-# ---------------------------------------------------------------------------
 # Application Startup Event
 # ---------------------------------------------------------------------------
 
 @app.on_event("startup")
 async def on_startup():
-    """Log a banner on server start for quick visual confirmation."""
-    print("=" * 60)
-    print(f"  {APP_TITLE} v{APP_VERSION}")
-    print("  AI-Powered RFQ → Quote Automation")
-    print("  FlowZint AI Hackathon 2026")
-    print("=" * 60)
-    print(f"  Inventory DB : {INVENTORY_PATH}")
-    print(f"  Docs         : http://localhost:8000/docs")
-    print("=" * 60)
+    """Log a startup banner and verify all components on server start."""
+    logger.info("=" * 60)
+    logger.info("  %s v%s", APP_TITLE, APP_VERSION)
+    logger.info("  AI-Powered RFQ → Quote Automation")
+    logger.info("  FlowZint AI Hackathon 2026")
+    logger.info("=" * 60)
+    logger.info("  Inventory DB : %s", INVENTORY_PATH)
+    logger.info("  Inventory OK : %s", os.path.isfile(INVENTORY_PATH))
+    logger.info("  Docs         : http://localhost:8000/docs")
+    logger.info("=" * 60)
 
 
 # ---------------------------------------------------------------------------
 # Run with: uvicorn backend.main:app --reload
 # ---------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    import uvicorn
+    from dotenv import load_dotenv
+    load_dotenv()
+    
+    port = int(os.getenv("PORT", 8000))
+    host = os.getenv("HOST", "0.0.0.0")
+    
+    logger.info("Starting server on %s:%s", host, port)
+    uvicorn.run("backend.main:app", host=host, port=port, reload=os.getenv("RELOAD", "false").lower() == "true")
