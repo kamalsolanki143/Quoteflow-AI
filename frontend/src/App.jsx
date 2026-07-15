@@ -15,6 +15,14 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { checkHealth, uploadRFQ, generateQuote, getInventory } from "./services/api";
+import Navbar from "./components/Navbar";
+import Hero from "./components/Hero";
+import StatsDashboard from "./components/StatsDashboard";
+import Workflow from "./components/Workflow";
+import Features from "./components/Features";
+import RFQUpload from "./components/RFQUpload";
+import InventoryPreview from "./components/InventoryPreview";
+import QuoteTable from "./components/QuoteTable";
 
 /* ========================================================================= */
 /*  INLINE STYLES — premium dark-mode glassmorphism theme                    */
@@ -653,624 +661,75 @@ export default function App() {
       {/* ================================================================= */}
       {/*  NAVBAR                                                           */}
       {/* ================================================================= */}
-      <nav className="nav-container" style={styles.nav}>
-        <div style={styles.logo}>
-          <span style={{ fontSize: 26 }}>⚡</span>
-          QuoteFlow <span style={{ ...styles.heroGradient }}>AI</span>
-        </div>
-        <ul className="nav-links" style={styles.navLinks}>
-          <li>
-            <a href="#upload" style={styles.navLink}>
-              Upload
-            </a>
-          </li>
-          <li>
-            <a href="#workflow" style={styles.navLink}>
-              Workflow
-            </a>
-          </li>
-          <li>
-            <a href="#inventory" style={styles.navLink}>
-              Inventory
-            </a>
-          </li>
-          <li>
-            <a href="#quote" style={styles.navLink}>
-              Quote
-            </a>
-          </li>
-          <li style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span
-              style={{
-                ...styles.logoDot,
-                background: statusColor,
-                boxShadow: `0 0 8px ${statusColor}`,
-              }}
-            />
-            <span style={{ fontSize: 12, color: statusColor, fontWeight: 600 }}>
-              {healthStatus === "healthy"
-                ? "API Online"
-                : healthStatus === "offline"
-                ? "API Offline"
-                : "Checking…"}
-            </span>
-          </li>
-        </ul>
-      </nav>
+      <Navbar healthStatus={healthStatus} />
 
       {/* ================================================================= */}
       {/*  HERO                                                             */}
       {/* ================================================================= */}
-      <header style={styles.hero}>
-        <div style={styles.heroBadge}>FlowZint AI Hackathon 2026</div>
-        <h1 style={styles.heroTitle}>
-          RFQ to Quote,{" "}
-          <span style={styles.heroGradient}>Automated by AI</span>
-        </h1>
-        <p style={styles.heroSub}>
-          QuoteFlow AI transforms your Request For Quotation documents into
-          professional, accurate quotations in seconds — powered by Gemini AI,
-          real-time inventory validation, and intelligent pricing.
-        </p>
-      </header>
+      <Hero />
 
       {/* ================================================================= */}
       {/*  STATISTICS CARDS                                                 */}
       {/* ================================================================= */}
-      <div className="stats-grid" style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-        gap: 20,
-        maxWidth: 1120,
-        margin: "0 auto 40px",
-        padding: "0 24px",
-      }}>
-        <div style={styles.card}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{ fontSize: 32 }}>📁</div>
-            <div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: palette.white }}>{DASHBOARD_STATS.rfqsProcessed}</div>
-              <div style={{ fontSize: 12, color: palette.textMuted, textTransform: "uppercase", letterSpacing: 0.8 }}>RFQs Processed</div>
-            </div>
-          </div>
-        </div>
-        <div style={styles.card}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{ fontSize: 32 }}>📦</div>
-            <div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: palette.white }}>{totalProducts}</div>
-              <div style={{ fontSize: 12, color: palette.textMuted, textTransform: "uppercase", letterSpacing: 0.8 }}>Products Available</div>
-            </div>
-          </div>
-        </div>
-        <div style={styles.card}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{ fontSize: 32 }}>📊</div>
-            <div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: palette.white }}>{totalStockUnits}</div>
-              <div style={{ fontSize: 12, color: palette.textMuted, textTransform: "uppercase", letterSpacing: 0.8 }}>Total Stock Units</div>
-            </div>
-          </div>
-        </div>
-        <div style={{ ...styles.card, boxShadow: `0 0 15px rgba(108,99,255,0.15)` }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{ fontSize: 32 }}>⚡</div>
-            <div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: palette.accent }}>{DASHBOARD_STATS.avgProcessingTime}</div>
-              <div style={{ fontSize: 12, color: palette.textMuted, textTransform: "uppercase", letterSpacing: 0.8 }}>Avg Time</div>
-            </div>
-          </div>
-        </div>
-        <div style={styles.card}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{ fontSize: 32 }}>📈</div>
-            <div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: palette.white }}>{DASHBOARD_STATS.approvalRate}</div>
-              <div style={{ fontSize: 12, color: palette.textMuted, textTransform: "uppercase", letterSpacing: 0.8 }}>Approval Rate</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <StatsDashboard 
+        totalProducts={totalProducts} 
+        totalStockUnits={totalStockUnits} 
+        DASHBOARD_STATS={DASHBOARD_STATS}
+        palette={palette}
+        styles={styles}
+      />
 
-      {/* ================================================================= */}
-      {/*  UPLOAD SECTION                                                   */}
-      {/* ================================================================= */}
-      <section id="upload" style={styles.section}>
-        <h2 style={styles.sectionTitle}>Upload Your RFQ</h2>
-        <p style={styles.sectionSub}>
-          Drop your PDF or TXT file below — our AI will handle the rest.
-        </p>
-
-        <div
-          className="upload-zone-container"
-          style={{
-            ...styles.uploadZone,
-            ...(isDragOver ? styles.uploadZoneActive : {}),
-          }}
-          onDragOver={onDragOver}
-          onDragLeave={onDragLeave}
-          onDrop={onDrop}
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <div style={styles.uploadIcon}>
-            {selectedFile ? "📎" : isDragOver ? "🎯" : "☁️"}
-          </div>
-          <div style={styles.uploadLabel}>
-            {selectedFile
-              ? selectedFile.name
-              : "Drag & drop your RFQ file here"}
-          </div>
-          <div style={styles.uploadHint}>
-            {selectedFile
-              ? `${(selectedFile.size / 1024).toFixed(1)} KB — ready to upload`
-              : "Supports PDF and TXT • Max 10 MB"}
-          </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".pdf,.txt"
-            onChange={onFileChange}
-            style={{ display: "none" }}
-          />
-        </div>
-
-        {selectedFile && (
-          <div style={{ textAlign: "center", marginTop: 20 }}>
-            <button
-              style={{
-                ...styles.uploadBtn,
-                opacity: loading ? 0.6 : 1,
-                cursor: loading ? "wait" : "pointer",
-              }}
-              onClick={handleUpload}
-              disabled={loading}
-            >
-              {loading ? "⏳ Processing…" : "🚀 Generate Quotation"}
-            </button>
-          </div>
-        )}
-
-        {/* ================================================================= */}
-        {/*  ERROR BOUNDARY UI                                                */}
-        {/* ================================================================= */}
-        {error && (
-          <div
-            style={{
-              maxWidth: 600,
-              margin: "24px auto 0",
-              background: "rgba(255, 82, 82, 0.05)",
-              border: `1px solid ${palette.error}`,
-              borderRadius: 12,
-              padding: 24,
-              textAlign: "center",
-              backdropFilter: "blur(12px)",
-            }}
-          >
-            <div style={{ fontSize: 36, marginBottom: 12 }}>⚠️</div>
-            <h3 style={{ color: palette.white, margin: "0 0 8px", fontSize: 18, fontWeight: 700 }}>
-              Processing Failed
-            </h3>
-            <p style={{ color: palette.text, fontSize: 14, margin: "0 0 16px", lineHeight: 1.5 }}>
-              {error}
-            </p>
-            <p style={{ color: palette.textMuted, fontSize: 12, margin: "0 0 20px" }}>
-              Our systems encountered an unexpected error. Please verify the document format or try again. For further assistance, please contact the project administrator.
-            </p>
-            <button
-              style={{
-                ...styles.uploadBtn,
-                background: `linear-gradient(135deg, ${palette.error}, #ff1744)`,
-                boxShadow: `0 4px 20px rgba(255, 82, 82, 0.3)`,
-                marginTop: 0,
-                opacity: !selectedFile ? 0.5 : 1,
-              }}
-              onClick={handleUpload}
-              disabled={!selectedFile}
-            >
-              🔄 Retry Operation
-            </button>
-          </div>
-        )}
-      </section>
-
-      {/* ================================================================= */}
-      {/*  RFQ PROCESSING TIMELINE                                          */}
-      {/* ================================================================= */}
-      {(loading || (timelineStep > 0 && timelineStep <= 5)) && (
-        <section style={{ ...styles.section, paddingTop: 0 }}>
-          <div style={{
-            ...styles.card,
-            maxWidth: 600,
-            margin: "0 auto",
-            textAlign: "center",
-          }}>
-            <h3 style={{ color: palette.white, fontSize: 18, marginBottom: 20, fontWeight: 700 }}>
-              RFQ Processing Pipeline
-            </h3>
-            
-            <div style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 12,
-            }}>
-              {PROCESSING_STEPS.map((stepLabel, idx) => {
-                const stepNum = idx + 1;
-                const isActive = timelineStep === stepNum;
-                const isCompleted = timelineStep > stepNum;
-                
-                let stepBg = "rgba(255,255,255,0.05)";
-                let shadow = "none";
-                let color = palette.textMuted;
-                
-                if (isCompleted) {
-                  stepBg = palette.success;
-                  color = palette.white;
-                } else if (isActive) {
-                  stepBg = stepNum === 5 && approved ? palette.success : palette.accent;
-                  color = palette.white;
-                  shadow = `0 0 10px ${stepNum === 5 && approved ? palette.success : palette.accent}`;
-                } else if (stepNum === 5 && approved) {
-                  stepBg = palette.success;
-                  color = palette.white;
-                }
-                
-                return (
-                  <React.Fragment key={idx}>
-                    {idx > 0 && <div className="timeline-arrow">↓</div>}
-                    <div style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 12,
-                      color: color,
-                      fontWeight: isActive ? 700 : 500,
-                      transition: "color 0.3s",
-                    }}>
-                      <div style={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: "50%",
-                        background: stepBg,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: 12,
-                        boxShadow: shadow,
-                        border: `1px solid ${isCompleted || isActive ? "transparent" : palette.cardBorder}`,
-                      }}>
-                        {isCompleted || (stepNum === 5 && approved) ? "✓" : stepNum}
-                      </div>
-                      <span>{stepNum === 5 && approved ? "Approved" : stepLabel}</span>
-                      {isActive && !approved && (
-                        stepNum === 5 ? <span className="timeline-pulse" /> : <span className="timeline-spinner" />
-                      )}
-                    </div>
-                  </React.Fragment>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ================================================================= */}
-      {/*  LOADING SKELETONS                                                */}
-      {/* ================================================================= */}
-      {loading && (
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>Generating Quotation</h2>
-          <p style={styles.sectionSub}>Please wait while AI processes the RFQ and matches inventory...</p>
-          <div style={styles.quoteResult}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
-              <div className="skeleton" style={{ width: "200px", height: "24px" }} />
-              <div className="skeleton" style={{ width: "120px", height: "24px", borderRadius: 999 }} />
-            </div>
-            <div className="quote-table-container">
-              <table style={styles.table}>
-                <thead>
-                  <tr>
-                    <th style={styles.th}>Product</th>
-                    <th style={styles.th}>SKU</th>
-                    <th style={styles.th}>Qty</th>
-                    <th style={styles.th}>Available</th>
-                    <th style={styles.th}>Unit Price</th>
-                    <th style={styles.th}>Line Total</th>
-                    <th style={styles.th}>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <SkeletonRow />
-                  <SkeletonRow />
-                  <SkeletonRow />
-                </tbody>
-              </table>
-            </div>
-            <div style={{ marginTop: 24, display: "flex", justifyContent: "flex-end" }}>
-              <div style={{ textAlign: "right" }}>
-                <div className="skeleton" style={{ width: "150px", height: "16px", marginBottom: 8 }} />
-                <div className="skeleton" style={{ width: "150px", height: "16px", marginBottom: 8 }} />
-                <div className="skeleton" style={{ width: "200px", height: "24px" }} />
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+      <RFQUpload
+        isDragOver={isDragOver}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
+        onDrop={onDrop}
+        fileInputRef={fileInputRef}
+        selectedFile={selectedFile}
+        onFileChange={onFileChange}
+        loading={loading}
+        error={error}
+        handleUpload={handleUpload}
+        timelineStep={timelineStep}
+        PROCESSING_STEPS={PROCESSING_STEPS}
+        approved={approved}
+        styles={styles}
+        palette={palette}
+        SkeletonRow={SkeletonRow}
+      />
 
       {/* ================================================================= */}
       {/*  INVENTORY PREVIEW SECTION                                        */}
       {/* ================================================================= */}
-      <section id="inventory" style={styles.section}>
-        <h2 style={styles.sectionTitle}>Inventory Preview</h2>
-        <p style={styles.sectionSub}>
-          Real-time snapshot of the database showing stock levels and availability status.
-        </p>
-        
-        <div style={styles.quoteResult}>
-          {loadingInventory ? (
-            <div style={{ textAlign: "center", padding: 20, color: palette.textMuted }}>
-              Loading inventory catalog...
-            </div>
-          ) : inventory.length === 0 ? (
-            <div style={{ textAlign: "center", padding: 20, color: palette.textMuted }}>
-              <div style={{ marginBottom: 12 }}>{inventoryError || "No inventory data available"}</div>
-              <button
-                style={{
-                  ...styles.uploadBtn,
-                  marginTop: 0,
-                  padding: "8px 20px",
-                  fontSize: 12,
-                }}
-                onClick={fetchInventory}
-              >
-                🔄 Refresh Inventory
-              </button>
-            </div>
-          ) : (
-            <div className="quote-table-container">
-              <table style={styles.table}>
-                <thead>
-                  <tr>
-                    <th style={styles.th}>Product Name</th>
-                    <th style={styles.th}>SKU</th>
-                    <th style={styles.th}>Stock Available</th>
-                    <th style={styles.th}>Unit Price</th>
-                    <th style={styles.th}>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {inventory.slice(0, 5).map((item) => {
-                    let badgeBg = "rgba(255, 82, 82, 0.12)";
-                    let badgeColor = palette.error;
-                    if (item.status === "in_stock") {
-                      badgeBg = "rgba(0, 230, 118, 0.12)";
-                      badgeColor = palette.success;
-                    } else if (item.status === "low_stock") {
-                      badgeBg = "rgba(255, 171, 0, 0.12)";
-                      badgeColor = palette.warning;
-                    }
-                    
-                    return (
-                      <tr key={item.id}>
-                        <td style={styles.td}>{item.name}</td>
-                        <td style={{ ...styles.td, fontFamily: "monospace", fontSize: 12 }}>
-                          {item.sku}
-                        </td>
-                        <td style={styles.td}>{item.stock} units</td>
-                        <td style={styles.td}>{fmt(item.unit_price)}</td>
-                        <td style={styles.td}>
-                          <span
-                            style={{
-                              ...styles.badge,
-                              background: badgeBg,
-                              color: badgeColor,
-                            }}
-                          >
-                            {item.status.replace("_", " ")}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </section>
+      <InventoryPreview
+        loadingInventory={loadingInventory}
+        inventory={inventory}
+        inventoryError={inventoryError}
+        fetchInventory={fetchInventory}
+        fmt={fmt}
+        styles={styles}
+        palette={palette}
+      />
 
       {/* ================================================================= */}
-      {/*  WORKFLOW SECTION                                                  */}
+      {/*  FEATURES & WORKFLOW SECTION                                      */}
       {/* ================================================================= */}
-      <section id="workflow" style={styles.section}>
-        <h2 style={styles.sectionTitle}>How It Works</h2>
-        <p style={styles.sectionSub}>
-          Six intelligent steps — from document to approved quotation.
-        </p>
-
-        <div style={styles.workflowGrid}>
-          {WORKFLOW_STEPS.map((step, i) => (
-            <div
-              key={i}
-              style={{
-                ...styles.stepCard,
-                ...(hoveredStep === i ? styles.cardHover : {}),
-              }}
-              onMouseEnter={() => setHoveredStep(i)}
-              onMouseLeave={() => setHoveredStep(null)}
-            >
-              <div style={styles.stepNumber}>{i + 1}</div>
-              <div style={{ fontSize: 28, marginBottom: 10 }}>{step.icon}</div>
-              <div style={styles.stepTitle}>{step.title}</div>
-              <div style={styles.stepDesc}>{step.desc}</div>
-            </div>
-          ))}
-        </div>
-      </section>
+      <Features />
+      <Workflow />
 
       {/* ================================================================= */}
       {/*  QUOTE RESULT SECTION                                             */}
       {/* ================================================================= */}
-      {quoteResult && !loading && (
-        <section id="quote" style={styles.section}>
-          <h2 style={styles.sectionTitle}>Generated Quotation</h2>
-          <p style={styles.sectionSub}>
-            Quote{" "}
-            <strong style={{ color: palette.accent }}>
-              {quoteResult.quote_id}
-            </strong>{" "}
-            for RFQ{" "}
-            <strong style={{ color: palette.accent }}>
-              {quoteResult.rfq_id}
-            </strong>
-          </p>
-
-          <div style={styles.quoteResult}>
-            {/* Status badge */}
-            <div style={{ marginBottom: 20, textAlign: "right" }}>
-              <span
-                style={{
-                  ...styles.badge,
-                  background: approved
-                    ? "rgba(0,230,118,0.15)"
-                    : "rgba(255,171,0,0.15)",
-                  color: approved ? palette.success : palette.warning,
-                }}
-              >
-                {approved ? "✅ Approved" : "⏳ Pending Approval"}
-              </span>
-            </div>
-
-            {/* Line items table */}
-            <div className="quote-table-container">
-              <table style={styles.table}>
-                <thead>
-                  <tr>
-                    <th style={styles.th}>Product</th>
-                    <th style={styles.th}>SKU</th>
-                    <th style={styles.th}>Qty</th>
-                    <th style={styles.th}>Available</th>
-                    <th style={styles.th}>Unit Price</th>
-                    <th style={styles.th}>Line Total</th>
-                    <th style={styles.th}>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {quoteResult.line_items.map((item, idx) => (
-                    <tr key={idx}>
-                      <td style={styles.td}>{item.product}</td>
-                      <td style={{ ...styles.td, fontFamily: "monospace", fontSize: 12 }}>
-                        {item.sku}
-                      </td>
-                      <td style={styles.td}>{item.requested_qty}</td>
-                      <td style={styles.td}>{item.available_qty}</td>
-                      <td style={styles.td}>{fmt(item.unit_price)}</td>
-                      <td style={styles.td}>{fmt(item.line_total)}</td>
-                      <td style={styles.td}>
-                        <span
-                          style={{
-                            ...styles.badge,
-                            background:
-                              item.status === "fulfilled"
-                                ? "rgba(0,230,118,0.12)"
-                                : "rgba(255,171,0,0.12)",
-                            color:
-                              item.status === "fulfilled"
-                                ? palette.success
-                                : palette.warning,
-                          }}
-                        >
-                          {item.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Totals */}
-            <div
-              style={{
-                marginTop: 24,
-                display: "flex",
-                justifyContent: "flex-end",
-              }}
-            >
-              <div style={{ textAlign: "right", lineHeight: 2 }}>
-                <div style={{ color: palette.textMuted }}>
-                  Subtotal:{" "}
-                  <strong style={{ color: palette.text }}>
-                    {fmt(quoteResult.pricing.subtotal)}
-                  </strong>
-                </div>
-                <div style={{ color: palette.textMuted }}>
-                  GST ({quoteResult.pricing.tax_rate}):{" "}
-                  <strong style={{ color: palette.text }}>
-                    {fmt(quoteResult.pricing.tax_amount)}
-                  </strong>
-                </div>
-                <div style={styles.totalRow}>
-                  Grand Total:{" "}
-                  <span style={{ color: palette.accent, fontSize: 20 }}>
-                    {fmt(quoteResult.pricing.grand_total)}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Approve button */}
-            {!approved && (
-              <div style={{ textAlign: "center", marginTop: 28 }}>
-                <button
-                  style={{
-                    ...styles.uploadBtn,
-                    background: `linear-gradient(135deg, ${palette.success}, #00c853)`,
-                    boxShadow: `0 4px 20px rgba(0,230,118,0.3)`,
-                  }}
-                  onClick={handleApprove}
-                >
-                  ✅ Approve Quotation
-                </button>
-              </div>
-            )}
-
-            {approved && (
-              <div
-                style={{
-                  textAlign: "center",
-                  marginTop: 28,
-                  padding: 20,
-                  borderRadius: 12,
-                  background: "rgba(0,230,118,0.06)",
-                  border: `1px solid rgba(0,230,118,0.2)`,
-                }}
-              >
-                <div style={{ fontSize: 32, marginBottom: 8 }}>🎉</div>
-                <div
-                  style={{
-                    fontWeight: 700,
-                    fontSize: 16,
-                    color: palette.success,
-                  }}
-                >
-                  Quotation Approved!
-                </div>
-                {approvalTime && (
-                  <div style={{ fontSize: 13, color: palette.success, marginTop: 4, fontWeight: 500 }}>
-                    Approved on: {approvalTime}
-                  </div>
-                )}
-                <div style={{ fontSize: 13, color: palette.textMuted, marginTop: 6 }}>
-                  The final quotation has been approved and is ready to be sent to
-                  the customer.
-                </div>
-                {/* FUTURE INTEGRATION: Integrate with email delivery service (e.g. SendGrid, Resend)
-                    or a WhatsApp webhook to automatically dispatch the generated quotation to the customer. */}
-              </div>
-            )}
-          </div>
-        </section>
-      )}
+      <QuoteTable
+        quoteResult={quoteResult}
+        loading={loading}
+        approved={approved}
+        approvalTime={approvalTime}
+        handleApprove={handleApprove}
+        fmt={fmt}
+        styles={styles}
+        palette={palette}
+      />
 
       {/* ================================================================= */}
       {/*  FOOTER                                                           */}

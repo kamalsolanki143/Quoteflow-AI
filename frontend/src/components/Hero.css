@@ -1,0 +1,228 @@
+/* Hero Section Wrapper */
+.quoteflow-hero-wrapper {
+  background-color: var(--bg-primary);
+  padding: 80px 24px 60px;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.quoteflow-hero-container {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Tag Badge */
+.hero-tag-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  background-color: var(--primary-light);
+  border: 1px solid rgba(37, 99, 255, 0.15);
+  border-radius: var(--radius-round);
+  margin-bottom: 24px;
+}
+
+.hero-tag-badge span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Headline */
+.hero-headline {
+  font-size: clamp(38px, 6vw, 64px);
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  margin-bottom: 20px;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--primary) 0%, #3b82f6 50%, #1d4ed8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Subtext */
+.hero-subtext {
+  font-size: clamp(16px, 2.5vw, 18px);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 680px;
+  margin-bottom: 36px;
+}
+
+/* Actions Group */
+.hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 64px;
+  width: 100%;
+}
+
+.hero-btn-main {
+  font-size: 15px;
+  padding: 12px 28px;
+}
+
+.hero-btn-main svg {
+  transition: transform var(--transition-fast);
+}
+
+.hero-btn-main:hover svg {
+  transform: translateY(2px);
+}
+
+.hero-btn-sub {
+  font-size: 15px;
+  padding: 12px 28px;
+}
+
+/* Dashboard Mockup Graphic */
+.hero-preview-wrapper {
+  width: 100%;
+  max-width: 800px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.preview-header {
+  height: 40px;
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 6px;
+  position: relative;
+}
+
+.preview-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #cbd5e1;
+}
+
+.preview-dot:nth-child(1) { background-color: #fca5a5; }
+.preview-dot:nth-child(2) { background-color: #fde68a; }
+.preview-dot:nth-child(3) { background-color: #a7f3d0; }
+
+.preview-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-family: monospace;
+}
+
+.preview-body {
+  height: 240px;
+  display: flex;
+}
+
+.preview-sidebar {
+  width: 160px;
+  border-right: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar-line {
+  height: 8px;
+  background-color: var(--border-color);
+  border-radius: var(--radius-sm);
+  width: 60%;
+}
+
+.sidebar-line.long {
+  width: 90%;
+  background-color: rgba(37, 99, 255, 0.15);
+}
+
+.preview-content {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.content-row {
+  display: flex;
+  gap: 16px;
+}
+
+.content-box {
+  flex: 1;
+  height: 48px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-secondary);
+}
+
+.content-main-box {
+  flex: 1;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.main-box-line {
+  height: 8px;
+  background-color: var(--border-color);
+  border-radius: var(--radius-sm);
+  width: 40%;
+}
+
+.main-box-line.header {
+  height: 12px;
+  background-color: rgba(37, 99, 255, 0.15);
+  width: 25%;
+  margin-bottom: 6px;
+}
+
+.main-box-line.long {
+  width: 85%;
+}
+
+/* Responsiveness overrides */
+@media (max-width: 640px) {
+  .quoteflow-hero-wrapper {
+    padding: 60px 16px 40px;
+  }
+  
+  .hero-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .hero-btn-main,
+  .hero-btn-sub {
+    width: 100%;
+  }
+  
+  .hero-preview-wrapper {
+    display: none; /* Hide interactive mockup graphics on small devices to save vertical space */
+  }
+}
