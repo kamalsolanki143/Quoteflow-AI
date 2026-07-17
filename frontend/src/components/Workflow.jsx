@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './Workflow.css';
+// import './Workflow.css';
 
 /**
  * Workflow Component
@@ -71,7 +71,7 @@ const Workflow = () => {
                     </svg>
                   </div>
                 )}
-                
+
                 {/* Step Circle Index */}
                 <div className="step-number-badge">
                   <span>{index + 1}</span>
