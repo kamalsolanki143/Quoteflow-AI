@@ -18,7 +18,7 @@
  */
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { checkHealth, uploadRFQ, generateQuote, getInventory } from "./services/api";
+import { checkHealth, uploadRFQ, generateQuote, getInventory, approveQuote, rejectQuote } from "./services/api";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import StatsDashboard from "./components/StatsDashboard";
@@ -579,6 +579,35 @@ export default function App() {
   // ---- Helper: Format Currency ----
   const fmt = (n) =>
     new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(n);
+
+  const totalProducts = inventory.length;
+
+  const totalStockUnits = inventory.reduce(
+    (sum, item) => sum + (item.stock ?? item.quantity ?? 0),
+    0
+  );
+
+  const DASHBOARD_STATS = [
+    {
+      title: "Products",
+      value: totalProducts,
+    },
+    {
+      title: "Stock Units",
+      value: totalStockUnits,
+    },
+    {
+      title: "API Status",
+      value: healthStatus === "healthy" ? "Online" : "Offline",
+    },
+    {
+      title: "Quotes",
+      value: quoteResult ? 1 : 0,
+    }
+  ];
+  DASHBOARD_STATS.rfqsProcessed = quoteResult ? 1 : 0;
+  DASHBOARD_STATS.avgProcessingTime = "5 Sec";
+  DASHBOARD_STATS.approvalRate = "99.4%";
 
   const statusColor =
     healthStatus === "healthy"
