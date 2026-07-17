@@ -389,8 +389,14 @@ export default function App() {
   // ---- Health Check & Inventory Fetch ----
   useEffect(() => {
     checkHealth()
-      .then(() => setHealthStatus("healthy"))
-      .catch(() => setHealthStatus("offline"));
+      .then((response) => {
+        if (response && response.status === "healthy") {
+          setHealthStatus("Online");
+        } else {
+          setHealthStatus("Offline");
+        }
+      })
+      .catch(() => setHealthStatus("Offline"));
 
     fetchInventory();
   }, []);
@@ -591,7 +597,7 @@ export default function App() {
     },
     {
       title: "API Status",
-      value: healthStatus === "healthy" ? "Online" : "Offline",
+      value: healthStatus === "Online" ? "Online" : "Offline",
     },
     {
       title: "Quotes",
@@ -603,9 +609,9 @@ export default function App() {
   DASHBOARD_STATS.approvalRate = "99.4%";
 
   const statusColor =
-    healthStatus === "healthy"
+    healthStatus === "Online"
       ? "#10B981"
-      : healthStatus === "offline"
+      : healthStatus === "Offline"
       ? "#EF4444"
       : "#F59E0B";
 

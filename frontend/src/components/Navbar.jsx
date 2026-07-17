@@ -50,9 +50,9 @@ const Navbar = ({ healthStatus = 'checking' }) => {
 
   const getStatusDetails = () => {
     switch (healthStatus) {
-      case 'healthy':
+      case 'Online':
         return { text: 'API Online', class: 'status-healthy' };
-      case 'offline':
+      case 'Offline':
         return { text: 'API Offline', class: 'status-offline' };
       default:
         return { text: 'Checking API...', class: 'status-checking' };

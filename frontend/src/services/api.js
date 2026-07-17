@@ -16,11 +16,13 @@ import axios from "axios";
 // Axios Instance — shared configuration
 // ---------------------------------------------------------------------------
 
-const API_BASE_URL =
-  import.meta.env?.VITE_API_URL || "http://localhost:8000";
+const VITE_API_URL =
+  import.meta.env?.VITE_API_URL ||
+  import.meta.env?.VITE_API_BASE_URL ||
+  "http://localhost:8000";
 
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: VITE_API_URL,
   timeout: 30_000, // 30 seconds — generous for AI processing
   headers: {
     "Content-Type": "application/json",
@@ -116,7 +118,10 @@ const withRetry = async (fn, retries = 2) => {
  *
  * @returns {Promise<import("axios").AxiosResponse>}
  */
-export const checkHealth = () => withRetry(() => apiClient.get(API_ENDPOINTS.HEALTH));
+export const checkHealth = () =>
+  withRetry(() =>
+    apiClient.get(API_ENDPOINTS.HEALTH).then((res) => res.data)
+  );
 
 /**
  * Upload RFQ Document
