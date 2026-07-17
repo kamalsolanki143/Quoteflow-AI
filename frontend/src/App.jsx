@@ -18,14 +18,309 @@
  */
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { 
-  checkHealth, 
-  uploadRFQ, 
-  generateQuote, 
-  getInventory, 
-  approveQuote, 
-  rejectQuote 
-} from "./services/api";
+import { checkHealth, uploadRFQ, generateQuote, getInventory } from "./services/api";
+import Navbar from "./components/Navbar";
+import Hero from "./components/Hero";
+import StatsDashboard from "./components/StatsDashboard";
+import Workflow from "./components/Workflow";
+import Features from "./components/Features";
+import RFQUpload from "./components/RFQUpload";
+import InventoryPreview from "./components/InventoryPreview";
+import QuoteTable from "./components/QuoteTable";
+
+/* ========================================================================= */
+/*  INLINE STYLES — premium dark-mode glassmorphism theme                    */
+/* ========================================================================= */
+
+const palette = {
+  bg: "#0a0e1a",
+  card: "rgba(255,255,255,0.04)",
+  cardBorder: "rgba(255,255,255,0.08)",
+  accent: "#6c63ff",
+  accentGlow: "rgba(108,99,255,0.35)",
+  success: "#00e676",
+  warning: "#ffab00",
+  error: "#ff5252",
+  text: "#e0e0e0",
+  textMuted: "#888",
+  white: "#fff",
+};
+
+const font =
+  "'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif";
+
+const styles = {
+  /* ---- global reset ---- */
+  app: {
+    margin: 0,
+    padding: 0,
+    fontFamily: font,
+    background: `linear-gradient(145deg, ${palette.bg} 0%, #111827 50%, #0a0e1a 100%)`,
+    color: palette.text,
+    minHeight: "100vh",
+    overflowX: "hidden",
+  },
+
+  /* ---- Navbar ---- */
+  nav: {
+    position: "sticky",
+    top: 0,
+    zIndex: 100,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "16px 40px",
+    backdropFilter: "blur(18px)",
+    background: "rgba(10,14,26,0.75)",
+    borderBottom: `1px solid ${palette.cardBorder}`,
+  },
+  logo: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    fontSize: 22,
+    fontWeight: 800,
+    letterSpacing: "-0.5px",
+    color: palette.white,
+  },
+  logoDot: {
+    width: 10,
+    height: 10,
+    borderRadius: "50%",
+    transition: "background 0.4s",
+  },
+  navLinks: {
+    display: "flex",
+    gap: 24,
+    listStyle: "none",
+    margin: 0,
+    padding: 0,
+  },
+  navLink: {
+    color: palette.textMuted,
+    textDecoration: "none",
+    fontSize: 14,
+    fontWeight: 500,
+    cursor: "pointer",
+    transition: "color 0.2s",
+  },
+
+  /* ---- Hero ---- */
+  hero: {
+    textAlign: "center",
+    padding: "80px 20px 40px",
+    position: "relative",
+  },
+  heroBadge: {
+    display: "inline-block",
+    padding: "6px 18px",
+    borderRadius: 999,
+    fontSize: 12,
+    fontWeight: 600,
+    letterSpacing: 1.2,
+    textTransform: "uppercase",
+    background: palette.accentGlow,
+    color: palette.accent,
+    marginBottom: 24,
+  },
+  heroTitle: {
+    fontSize: "clamp(36px, 5vw, 64px)",
+    fontWeight: 900,
+    lineHeight: 1.1,
+    color: palette.white,
+    margin: "0 0 20px",
+  },
+  heroGradient: {
+    background: `linear-gradient(90deg, ${palette.accent}, #a78bfa, #38bdf8)`,
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+  },
+  heroSub: {
+    maxWidth: 640,
+    margin: "0 auto 40px",
+    fontSize: 17,
+    lineHeight: 1.7,
+    color: palette.textMuted,
+  },
+
+  /* ---- Section ---- */
+  section: {
+    maxWidth: 1120,
+    margin: "0 auto",
+    padding: "40px 24px",
+  },
+  sectionTitle: {
+    fontSize: 28,
+    fontWeight: 700,
+    color: palette.white,
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  sectionSub: {
+    textAlign: "center",
+    color: palette.textMuted,
+    marginBottom: 40,
+    fontSize: 15,
+  },
+
+  /* ---- Glass Card ---- */
+  card: {
+    background: palette.card,
+    border: `1px solid ${palette.cardBorder}`,
+    borderRadius: 16,
+    padding: 28,
+    backdropFilter: "blur(12px)",
+    transition: "transform 0.25s, box-shadow 0.25s",
+  },
+  cardHover: {
+    transform: "translateY(-4px)",
+    boxShadow: `0 12px 40px ${palette.accentGlow}`,
+  },
+
+  /* ---- Upload Zone ---- */
+  uploadZone: {
+    border: `2px dashed ${palette.cardBorder}`,
+    borderRadius: 16,
+    padding: "48px 24px",
+    textAlign: "center",
+    cursor: "pointer",
+    transition: "border-color 0.3s, background 0.3s",
+    background: palette.card,
+    maxWidth: 600,
+    margin: "0 auto",
+  },
+  uploadZoneActive: {
+    borderColor: palette.accent,
+    background: "rgba(108,99,255,0.08)",
+  },
+  uploadIcon: {
+    fontSize: 48,
+    marginBottom: 12,
+  },
+  uploadLabel: {
+    fontSize: 16,
+    fontWeight: 600,
+    color: palette.white,
+    marginBottom: 6,
+  },
+  uploadHint: {
+    fontSize: 13,
+    color: palette.textMuted,
+  },
+  uploadBtn: {
+    marginTop: 20,
+    padding: "12px 32px",
+    borderRadius: 10,
+    border: "none",
+    fontWeight: 700,
+    fontSize: 14,
+    cursor: "pointer",
+    color: palette.white,
+    background: `linear-gradient(135deg, ${palette.accent}, #a78bfa)`,
+    boxShadow: `0 4px 20px ${palette.accentGlow}`,
+    transition: "transform 0.2s, box-shadow 0.2s",
+  },
+
+  /* ---- Workflow Steps ---- */
+  workflowGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+    gap: 20,
+  },
+  stepCard: {
+    position: "relative",
+    background: palette.card,
+    border: `1px solid ${palette.cardBorder}`,
+    borderRadius: 14,
+    padding: "28px 22px",
+    backdropFilter: "blur(12px)",
+    textAlign: "center",
+    transition: "transform 0.25s, box-shadow 0.25s",
+    cursor: "default",
+  },
+  stepNumber: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 36,
+    height: 36,
+    borderRadius: "50%",
+    fontWeight: 800,
+    fontSize: 14,
+    marginBottom: 14,
+    background: `linear-gradient(135deg, ${palette.accent}, #a78bfa)`,
+    color: palette.white,
+  },
+  stepTitle: {
+    fontSize: 15,
+    fontWeight: 700,
+    color: palette.white,
+    marginBottom: 6,
+  },
+  stepDesc: {
+    fontSize: 13,
+    color: palette.textMuted,
+    lineHeight: 1.55,
+  },
+
+  /* ---- Quote Result ---- */
+  quoteResult: {
+    maxWidth: 800,
+    margin: "0 auto",
+    background: palette.card,
+    border: `1px solid ${palette.cardBorder}`,
+    borderRadius: 16,
+    padding: 28,
+    backdropFilter: "blur(12px)",
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    marginTop: 16,
+    fontSize: 13,
+  },
+  th: {
+    textAlign: "left",
+    padding: "10px 12px",
+    borderBottom: `1px solid ${palette.cardBorder}`,
+    color: palette.accent,
+    fontWeight: 700,
+    fontSize: 12,
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+  },
+  td: {
+    padding: "10px 12px",
+    borderBottom: `1px solid rgba(255,255,255,0.03)`,
+    color: palette.text,
+  },
+  totalRow: {
+    fontWeight: 700,
+    color: palette.white,
+    fontSize: 15,
+  },
+
+  /* ---- Status Badge ---- */
+  badge: {
+    display: "inline-block",
+    padding: "4px 12px",
+    borderRadius: 999,
+    fontSize: 11,
+    fontWeight: 700,
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+  },
+
+  /* ---- Footer ---- */
+  footer: {
+    textAlign: "center",
+    padding: "40px 20px 24px",
+    fontSize: 13,
+    color: palette.textMuted,
+    borderTop: `1px solid ${palette.cardBorder}`,
+    marginTop: 60,
+  },
+};
 
 /* ========================================================================= */
 /*  STATIC DATA MATCHING FIGMA DESIGNS                                       */
@@ -1218,545 +1513,75 @@ export default function App() {
       {/* ================================================================= */}
       {/*  NAVBAR                                                           */}
       {/* ================================================================= */}
-      <nav className="main-nav">
-        <div className="container nav-wrapper">
-          <div className="nav-logo" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <span style={{ fontSize: 26 }}>⚡</span>
-            QuoteFlow <span className="gradient-text">AI</span>
-          </div>
-
-          <button className="nav-toggle" onClick={() => setIsNavOpen(!isNavOpen)}>
-            {isNavOpen ? "✕" : "☰"}
-          </button>
-
-          <ul className={`nav-menu ${isNavOpen ? 'open' : ''}`}>
-            <li className="nav-item" onClick={() => setIsNavOpen(false)}><a href="#workflow">Workflow</a></li>
-            <li className="nav-item" onClick={() => setIsNavOpen(false)}><a href="#upload">Upload RFQ</a></li>
-            <li className="nav-item" onClick={() => setIsNavOpen(false)}><a href="#inventory">Inventory Preview</a></li>
-            {quoteResult && (
-              <li className="nav-item" onClick={() => setIsNavOpen(false)}><a href="#quote">Financial Review</a></li>
-            )}
-            <li>
-              <div className="api-health-tag">
-                <span className="health-dot" style={{ background: statusColor, boxShadow: `0 0 8px ${statusColor}` }} />
-                <span style={{ color: statusColor }}>
-                  {healthStatus === "healthy" ? "API ONLINE" : healthStatus === "offline" ? "API OFFLINE" : "CHECKING..."}
-                </span>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </nav>
+      <Navbar healthStatus={healthStatus} />
 
       {/* ================================================================= */}
       {/*  HERO SECTION                                                     */}
       {/* ================================================================= */}
-      <header className="hero-section container">
-        <div className="badge-category">🤖 FlowZint AI Hackathon 2026</div>
-        <h1 className="hero-title">
-          Transform Messy RFQs into <br />
-          <span className="gradient-text">Automated Quotations</span>
-        </h1>
-        <p className="hero-sub">
-          An intelligent, AI-powered automation engine that instantly parses customer RFQ PDFs, 
-          verifies warehouse inventory levels, and generates professional quotes.
-        </p>
-        <button 
-          className="action-button btn-filled-primary"
-          onClick={() => document.getElementById("upload")?.scrollIntoView({ behavior: "smooth" })}
-        >
-          Automate Now ⚡
-        </button>
-      </header>
+      <Hero />
 
       {/* ================================================================= */}
       {/*  STATISTICS & VALUE PROP CARDS                                    */}
       {/* ================================================================= */}
-      <section className="container" style={{ paddingBottom: "24px" }}>
-        <div className="stats-grid">
-          {STATS_DATA.map((stat, i) => (
-            <div key={i} className="glass-panel stat-card">
-              <div className="stat-icon">{stat.icon}</div>
-              <div className="stat-value">{stat.value}</div>
-              <div className="stat-label">{stat.label}</div>
-            </div>
-          ))}
-        </div>
+      <StatsDashboard 
+        totalProducts={totalProducts} 
+        totalStockUnits={totalStockUnits} 
+        DASHBOARD_STATS={DASHBOARD_STATS}
+        palette={palette}
+        styles={styles}
+      />
 
-        {/* side by side comparison */}
-        <div className="transform-grid">
-          <div className="glass-panel comparison-card old-way">
-            <h3 className="comparison-title">❌ The Old Manual Way</h3>
-            <ul className="comparison-list">
-              <li>Sales reps spend hours manually re-typing items from customer PDFs into Excel sheets.</li>
-              <li>Human errors lead to inaccurate volume discounts, tax calculations, and revenue leakage.</li>
-              <li>Slow quotation turnaround times (often 24–48 hours) cause hot B2B buyers to jump to competitors.</li>
-            </ul>
-          </div>
-          <div className="glass-panel comparison-card new-way">
-            <h3 className="comparison-title">🟢 The QuoteFlow AI Way</h3>
-            <ul className="comparison-list">
-              <li>Automated LLM parser reads and extracts complex product line-items in under 5 seconds.</li>
-              <li>Rules-based calculation engine guarantees 100% pricing accuracy with zero manual touch.</li>
-              <li>Instantly generates a professional invoice template and delivers it seamlessly via WhatsApp/Email.</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* ================================================================= */}
-      {/*  STREAMLINED WORKFLOW STEPS                                       */}
-      {/* ================================================================= */}
-      <section id="workflow" className="panel-section container">
-        <div className="section-header">
-          <h2>Streamlined Workflow</h2>
-          <p>Six intelligent steps from document parsing to finalized order quote approval.</p>
-        </div>
-
-        <div className="workflow-timeline">
-          {WORKFLOW_STEPS.map((step, i) => (
-            <div
-              key={i}
-              className={`glass-panel workflow-card ${hoveredStep === i ? "workflow-card-hovered" : ""}`}
-              onMouseEnter={() => setHoveredStep(i)}
-              onMouseLeave={() => setHoveredStep(null)}
-            >
-              <div className="workflow-num">{i + 1}</div>
-              <div className="workflow-icon">{step.icon}</div>
-              <div className="workflow-title">{step.title}</div>
-              <div className="workflow-desc">{step.desc}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ================================================================= */}
-      {/*  UPLOAD RFQ SECTION                                               */}
-      {/* ================================================================= */}
-      <section id="upload" className="panel-section container">
-        <div className="section-header">
-          <h2>Upload Customer RFQ</h2>
-          <p>Our intelligent AI agent will instantly extract line items, verify database inventory, and structure your pricing.</p>
-        </div>
-
-        <div className="glass-panel" style={{ maxWidth: "780px", margin: "0 auto" }}>
-          <div
-            className={`uploader-box ${isDragOver ? "drag-over" : ""}`}
-            onDragOver={onDragOver}
-            onDragLeave={onDragLeave}
-            onDrop={onDrop}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <div className="uploader-icon">
-              {selectedFile ? "📎" : isDragOver ? "🎯" : "☁️"}
-            </div>
-            <div className="uploader-title">
-              {selectedFile ? selectedFile.name : "Drag & drop your customer RFQ file here"}
-            </div>
-            <p className="uploader-info">
-              {selectedFile ? (
-                <strong style={{ color: "var(--accent)" }}>
-                  {(selectedFile.size / 1024).toFixed(1)} KB — Click "Process" to continue
-                </strong>
-              ) : (
-                <span>
-                  or <span className="uploader-link">click to browse your computer</span>
-                </span>
-              )}
-            </p>
-            <div className="uploader-info" style={{ marginTop: "12px", fontSize: "11px" }}>
-              Supports PDF, Excel, and raw text logs (Max 50MB)
-            </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".pdf,.txt"
-              onChange={onFileChange}
-              style={{ display: "none" }}
-            />
-          </div>
-
-          {selectedFile && (
-            <div style={{ textAlign: "center", marginTop: 24 }}>
-              <button
-                className="action-button btn-filled-accent"
-                onClick={handleUpload}
-                disabled={loading}
-              >
-                {loading ? "⏳ Extracting & Validating..." : "Process with QuoteFlow AI ⚡"}
-              </button>
-            </div>
-          )}
-
-          {/* Error Message Box */}
-          {error && (
-            <div className="error-box animate-fade-in">
-              <div className="error-box-icon">⚠️</div>
-              <h3>Processing Failure</h3>
-              <p>{error}</p>
-              <button
-                className="action-button btn-filled-error"
-                onClick={handleUpload}
-                disabled={!selectedFile}
-              >
-                🔄 Retry Operation
-              </button>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* ================================================================= */}
-      {/*  PROCESSING TIMELINE INDICATOR                                    */}
-      {/* ================================================================= */}
-      {(loading || (timelineStep > 0 && timelineStep <= 5)) && (
-        <section className="panel-section container">
-          <div className="glass-panel pipeline-card">
-            <h3 className="pipeline-title">RFQ Processing Pipeline</h3>
-            <div className="pipeline-steps">
-              {PROCESSING_STEPS.map((stepLabel, idx) => {
-                const stepNum = idx + 1;
-                const isActive = timelineStep === stepNum;
-                const isCompleted = timelineStep > stepNum;
-                let stepClass = "";
-
-                if (isCompleted) stepClass = "completed";
-                else if (isActive) stepClass = "active";
-
-                return (
-                  <React.Fragment key={idx}>
-                    {idx > 0 && <div className="pipeline-connector">↓</div>}
-                    <div className={`pipeline-step-item ${stepClass}`}>
-                      <div className="step-circle">
-                        {isCompleted || (stepNum === 5 && approved) ? "✓" : stepNum}
-                      </div>
-                      <span className="pipeline-label">
-                        {stepNum === 5 && approved ? "Approved" : stepNum === 5 && rejected ? "Rejected" : stepLabel}
-                      </span>
-                      {isActive && !approved && !rejected && (
-                        stepNum === 5 ? <span className="pipeline-pulse" /> : <span className="pipeline-spinner" />
-                      )}
-                    </div>
-                  </React.Fragment>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
+      <RFQUpload
+        isDragOver={isDragOver}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
+        onDrop={onDrop}
+        fileInputRef={fileInputRef}
+        selectedFile={selectedFile}
+        onFileChange={onFileChange}
+        loading={loading}
+        error={error}
+        handleUpload={handleUpload}
+        timelineStep={timelineStep}
+        PROCESSING_STEPS={PROCESSING_STEPS}
+        approved={approved}
+        styles={styles}
+        palette={palette}
+        SkeletonRow={SkeletonRow}
+      />
 
       {/* ================================================================= */}
       {/*  INVENTORY PREVIEW SECTION                                        */}
       {/* ================================================================= */}
-      <section id="inventory" className="panel-section container">
-        <div className="section-header">
-          <h2>Inventory Database Preview</h2>
-          <p>Real-time snapshot of the database showing stock levels and pricing records on the warehouse server.</p>
-        </div>
-
-        <div className="glass-panel">
-          {loadingInventory ? (
-            <div style={{ textAlign: "center", padding: "40px 0", color: "var(--text-muted)" }}>
-              <div className="pipeline-spinner" style={{ width: 24, height: 24, marginBottom: 12 }} />
-              <div>Loading inventory database catalog...</div>
-            </div>
-          ) : inventory.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "30px 0" }}>
-              <p style={{ marginBottom: 16 }}>{inventoryError || "No inventory available in catalog."}</p>
-              <button className="action-button btn-flat-secondary" onClick={fetchInventory}>
-                🔄 Refresh Inventory Data
-              </button>
-            </div>
-          ) : (
-            <div className="table-responsive">
-              <table className="custom-table">
-                <thead>
-                  <tr>
-                    <th>Product Name</th>
-                    <th>SKU Number</th>
-                    <th>Stock Available</th>
-                    <th>Unit Price</th>
-                    <th>Stock Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {inventory.slice(0, 5).map((item) => {
-                    let badgeClass = "badge-filled-error";
-                    if (item.status === "in_stock") {
-                      badgeClass = "badge-filled-success";
-                    } else if (item.status === "low_stock") {
-                      badgeClass = "badge-filled-warning";
-                    }
-
-                    return (
-                      <tr key={item.id}>
-                        <td><strong>{item.name}</strong></td>
-                        <td style={{ fontFamily: "monospace", fontSize: 13 }}>{item.sku}</td>
-                        <td>{item.stock} units</td>
-                        <td>{fmt(item.unit_price)}</td>
-                        <td>
-                          <span className={`status-badge ${badgeClass}`}>
-                            {item.status.replace("_", " ")}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </section>
+      <InventoryPreview
+        loadingInventory={loadingInventory}
+        inventory={inventory}
+        inventoryError={inventoryError}
+        fetchInventory={fetchInventory}
+        fmt={fmt}
+        styles={styles}
+        palette={palette}
+      />
 
       {/* ================================================================= */}
-      {/*  MANAGER APPROVAL & FINANCIAL REVIEW                              */}
+      {/*  FEATURES & WORKFLOW SECTION                                      */}
       {/* ================================================================= */}
-      {quoteResult && !loading && (
-        <section id="quote" className="panel-section container animate-fade-in">
-          <div className="section-header">
-            <h2>Manager Approval & Financial Review</h2>
-            <p>
-              Quote ID: <strong style={{ color: "var(--accent)" }}>{quoteResult.quote_id}</strong> | 
-              RFQ ID: <strong style={{ color: "var(--accent)" }}>{quoteResult.rfq_id}</strong>
-            </p>
-          </div>
+      <Features />
+      <Workflow />
 
-          <div className="glass-panel">
-            {/* Status indicator banner */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 800 }}>Financial Sheet Preview</h3>
-              <span className={`status-badge ${approved ? 'badge-filled-success' : rejected ? 'badge-filled-error' : 'badge-filled-warning'}`}>
-                {approved ? "✅ Approved" : rejected ? "❌ Rejected" : "⏳ Pending Approval"}
-              </span>
-            </div>
-
-            {/* Split Column Layout */}
-            <div className="dashboard-grid">
-              
-              {/* Left Column: Data & Quote items */}
-              <div>
-                <div className="client-details-card">
-                  <div className="details-header">Customer Details Card</div>
-                  <div className="details-item">Client Name: <strong>Acme Industries</strong></div>
-                  <div className="details-item">Email: <strong>info@acme.com</strong></div>
-                </div>
-
-                <div className="payload-items-card">
-                  <div className="payload-header">Quotation Data Payload</div>
-                  <div style={{ marginBottom: 12, fontSize: 13, color: "var(--text-muted)" }}>
-                    Quote ID: <span style={{ color: "var(--text-main)", fontWeight: 600 }}>{quoteResult.quote_id}</span><br />
-                    Status: <span style={{ color: approved ? "var(--success)" : rejected ? "var(--error)" : "var(--warning)", fontWeight: 600 }}>
-                      {approved ? "APPROVED" : rejected ? "REJECTED" : "PENDING APPROVAL"}
-                    </span>
-                  </div>
-                  
-                  <div className="table-responsive">
-                    <table className="custom-table" style={{ fontSize: 13 }}>
-                      <thead>
-                        <tr>
-                          <th>Item</th>
-                          <th>Qty</th>
-                          <th>Line Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {quoteResult.line_items.map((item, idx) => (
-                          <tr key={idx}>
-                            <td>{item.product}</td>
-                            <td>{item.requested_qty}</td>
-                            <td>{fmt(item.line_total)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <div className="finance-summary">
-                    <div className="finance-row">
-                      <span>Subtotal:</span>
-                      <span>{fmt(quoteResult.pricing.subtotal)}</span>
-                    </div>
-                    <div className="finance-row">
-                      <span>GST ({quoteResult.pricing.tax_rate}):</span>
-                      <span>{fmt(quoteResult.pricing.tax_amount)}</span>
-                    </div>
-                    <div className="finance-row grand-total">
-                      <span>Grand Total:</span>
-                      <span style={{ color: "var(--accent)" }}>{fmt(quoteResult.pricing.grand_total)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column: Override Control Form */}
-              <div className="override-panel">
-                <div className="override-title">Manager Override Control</div>
-                
-                <div className="override-form-group">
-                  <label className="override-label">Manager Name</label>
-                  <div className="override-input-wrapper">
-                    <input 
-                      type="text" 
-                      className="override-input" 
-                      value={managerName} 
-                      onChange={(e) => setManagerName(e.target.value)}
-                      disabled={approved || rejected}
-                    />
-                    <span className="input-edit-icon">✏️</span>
-                  </div>
-                </div>
-
-                <div className="override-form-row">
-                  <div className="override-form-group">
-                    <label className="override-label">Applied Discount</label>
-                    <div className="override-input-wrapper">
-                      <input 
-                        type="text" 
-                        className="override-input" 
-                        value={appliedDiscount} 
-                        onChange={(e) => setAppliedDiscount(e.target.value)}
-                        disabled={approved || rejected}
-                      />
-                      <span className="input-edit-icon">✏️</span>
-                    </div>
-                  </div>
-                  <div className="override-form-group">
-                    <label className="override-label">Override Reason</label>
-                    <div className="override-input-wrapper">
-                      <input 
-                        type="text" 
-                        className="override-input" 
-                        value={overrideReason} 
-                        onChange={(e) => setOverrideReason(e.target.value)}
-                        disabled={approved || rejected}
-                      />
-                      <span className="input-edit-icon">✏️</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="override-form-group">
-                  <label className="override-label">Expected Delivery Schedule</label>
-                  <div className="override-input-wrapper">
-                    <input 
-                      type="date" 
-                      className="override-input" 
-                      value={expectedDelivery} 
-                      onChange={(e) => setExpectedDelivery(e.target.value)}
-                      disabled={approved || rejected}
-                    />
-                  </div>
-                </div>
-
-                <div className="override-form-group">
-                  <label className="override-label">Internal Approval Notes</label>
-                  <textarea 
-                    className="override-input" 
-                    style={{ minHeight: "80px", resize: "none" }}
-                    value={overrideNotes} 
-                    onChange={(e) => setOverrideNotes(e.target.value)}
-                    disabled={approved || rejected}
-                  />
-                </div>
-
-                <div className="recommendation-banner">
-                  <span style={{ fontSize: 16 }}>💡</span>
-                  <div>
-                    <strong>AI Recommendation:</strong> Price calculations match all catalog guidelines. 
-                    Recommended discount: 2%. Auto-allocation checks complete.
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            {/* Detailed line items table (always available for deeper inspection) */}
-            <h3 style={{ fontSize: 16, fontWeight: 700, marginTop: 40, marginBottom: 16 }}>Line Item Inventory Check</h3>
-            <div className="table-responsive">
-              <table className="custom-table">
-                <thead>
-                  <tr>
-                    <th>Product</th>
-                    <th>SKU</th>
-                    <th>Requested</th>
-                    <th>Available</th>
-                    <th>Unit Price</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {quoteResult.line_items.map((item, idx) => (
-                    <tr key={idx}>
-                      <td><strong>{item.product}</strong></td>
-                      <td style={{ fontFamily: "monospace", fontSize: 13 }}>{item.sku}</td>
-                      <td>{item.requested_qty}</td>
-                      <td>{item.available_qty} units</td>
-                      <td>{fmt(item.unit_price)}</td>
-                      <td>{fmt(item.line_total)}</td>
-                      <td>
-                        <span className={`status-badge ${item.status === 'fulfilled' ? 'badge-filled-success' : 'badge-filled-warning'}`}>
-                          {item.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Approval/Rejection status feedback messages */}
-            {approvalMessage && (
-              <div style={{
-                marginTop: 32,
-                padding: 24,
-                borderRadius: 12,
-                textAlign: "center",
-                background: approved ? "rgba(16, 185, 129, 0.08)" : "rgba(239, 68, 68, 0.08)",
-                border: `1px solid ${approved ? "rgba(16, 185, 129, 0.3)" : "rgba(239, 68, 68, 0.3)"}`,
-                animation: "fadeIn 0.5s ease"
-              }}>
-                <div style={{ fontSize: 32, marginBottom: 8 }}>{approved ? "🎉" : "⚠️"}</div>
-                <h4 style={{ color: approved ? "var(--success)" : "var(--error)", fontWeight: 800, fontSize: 16, marginBottom: 4 }}>
-                  {approved ? "Quotation Approved Successfully!" : "Quotation Rejected"}
-                </h4>
-                <p style={{ fontSize: 14, color: "var(--text-main)", marginBottom: 6 }}>{approvalMessage}</p>
-                <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
-                  Processed by {managerName} on {approved ? approvalTime : rejectionTime}
-                </div>
-              </div>
-            )}
-
-            {/* Control Actions buttons */}
-            {!approved && !rejected && (
-              <div className="dashboard-actions-row">
-                <button
-                  className="action-button btn-filled-success"
-                  onClick={handleApprove}
-                  disabled={isSubmittingApproval}
-                >
-                  {isSubmittingApproval ? "Processing..." : "✓ Approve & Send"}
-                </button>
-                <button
-                  className="action-button btn-filled-error"
-                  onClick={handleReject}
-                  disabled={isSubmittingApproval}
-                >
-                  {isSubmittingApproval ? "Processing..." : "✕ Reject"}
-                </button>
-                <button
-                  className="action-button btn-flat-secondary"
-                  onClick={() => alert("Re-routing parameters details to warehouse system...")}
-                  disabled={isSubmittingApproval}
-                >
-                  Changes
-                </button>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
+      {/* ================================================================= */}
+      {/*  QUOTE RESULT SECTION                                             */}
+      {/* ================================================================= */}
+      <QuoteTable
+        quoteResult={quoteResult}
+        loading={loading}
+        approved={approved}
+        approvalTime={approvalTime}
+        handleApprove={handleApprove}
+        fmt={fmt}
+        styles={styles}
+        palette={palette}
+      />
 
       {/* ================================================================= */}
       {/*  FOOTER                                                           */}
