@@ -41,11 +41,11 @@ from backend.utils.helpers import extract_text_from_file, server_timestamp
 
 logger = logging.getLogger("quoteflow")
 
-router = APIRouter()
+router = APIRouter(prefix="/api/v1/rfq")
 
 
 @router.post(
-    "/api/v1/rfq/upload",
+    "/upload",
     tags=["RFQ Processing"],
     summary="Upload an RFQ document",
     response_description="Structured RFQ data with inventory validation",

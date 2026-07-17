@@ -28,11 +28,11 @@ from backend.utils.constants import LOG_ERROR
 
 logger = logging.getLogger("quoteflow")
 
-router = APIRouter()
+router = APIRouter(prefix="/api/v1/quote")
 
 
 @router.post(
-    "/api/v1/quote/generate",
+    "/generate",
     tags=["Quote Generation"],
     summary="Generate a quotation from extracted RFQ data",
     response_description="Complete quotation with line items, GST, and grand total",

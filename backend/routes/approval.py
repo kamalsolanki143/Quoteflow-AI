@@ -24,7 +24,7 @@ from backend.utils.helpers import server_timestamp
 
 logger = logging.getLogger("quoteflow")
 
-router = APIRouter()
+router = APIRouter(prefix="/api/v1/quote")
 
 
 # ---------------------------------------------------------------------------
@@ -33,7 +33,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/api/v1/quote/approve",
+    "/approve",
     tags=["Manager Approval"],
     summary="Approve a generated quotation",
     response_description="Approval confirmation with quote ID and timestamp",
@@ -97,7 +97,7 @@ async def approve_quote(payload: dict):
 
 
 @router.post(
-    "/api/v1/quote/reject",
+    "/reject",
     tags=["Manager Approval"],
     summary="Reject a generated quotation",
     response_description="Rejection confirmation with reason and timestamp",

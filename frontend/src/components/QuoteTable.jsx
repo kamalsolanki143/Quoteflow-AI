@@ -1,7 +1,30 @@
 import React from 'react';
 import ApprovalCard from './ApprovalCard';
 
-const QuoteTable = ({ quoteResult, loading, approved, approvalTime, handleApprove, fmt, styles, palette }) => {
+const QuoteTable = ({
+  quoteResult,
+  loading,
+  approved,
+  rejected,
+  approvalTime,
+  rejectionTime,
+  managerName,
+  setManagerName,
+  overrideNotes,
+  setOverrideNotes,
+  appliedDiscount,
+  setAppliedDiscount,
+  overrideReason,
+  setOverrideReason,
+  expectedDelivery,
+  setExpectedDelivery,
+  handleApprove,
+  handleReject,
+  isSubmittingApproval,
+  fmt,
+  styles,
+  palette,
+}) => {
   if (!quoteResult || loading) return null;
 
   return (
@@ -26,11 +49,17 @@ const QuoteTable = ({ quoteResult, loading, approved, approvalTime, handleApprov
               ...styles.badge,
               background: approved
                 ? "rgba(0,230,118,0.15)"
+                : rejected
+                ? "rgba(255,82,82,0.15)"
                 : "rgba(255,171,0,0.15)",
-              color: approved ? palette.success : palette.warning,
+              color: approved
+                ? palette.success
+                : rejected
+                ? palette.error
+                : palette.warning,
             }}
           >
-            {approved ? "✅ Approved" : "⏳ Pending Approval"}
+            {approved ? "✅ Approved" : rejected ? "❌ Rejected" : "⏳ Pending Approval"}
           </span>
         </div>
 
@@ -113,9 +142,25 @@ const QuoteTable = ({ quoteResult, loading, approved, approvalTime, handleApprov
         </div>
 
         <ApprovalCard 
+          quoteResult={quoteResult}
           approved={approved}
+          rejected={rejected}
           approvalTime={approvalTime}
+          rejectionTime={rejectionTime}
+          managerName={managerName}
+          setManagerName={setManagerName}
+          overrideNotes={overrideNotes}
+          setOverrideNotes={setOverrideNotes}
+          appliedDiscount={appliedDiscount}
+          setAppliedDiscount={setAppliedDiscount}
+          overrideReason={overrideReason}
+          setOverrideReason={setOverrideReason}
+          expectedDelivery={expectedDelivery}
+          setExpectedDelivery={setExpectedDelivery}
           handleApprove={handleApprove}
+          handleReject={handleReject}
+          isSubmittingApproval={isSubmittingApproval}
+          fmt={fmt}
           styles={styles}
           palette={palette}
         />

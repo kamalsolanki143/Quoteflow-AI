@@ -42,49 +42,38 @@ const Workflow = () => {
   ];
 
   return (
-    <section id="workflow" className="quoteflow-workflow-wrapper">
+    <section id="workflow" className="panel-section">
       <div className="container">
         {/* Section Header */}
-        <div className="workflow-header">
-          <h2 className="section-title">The QuoteFlow Pipeline</h2>
-          <p className="section-subtext">
+        <div className="section-header">
+          <h2>The QuoteFlow Pipeline</h2>
+          <p>
             From raw customer documents to approved quotations in six simple, automated stages.
           </p>
         </div>
 
         {/* Steps Grid */}
-        <div className="workflow-steps-grid">
+        <div className="workflow-timeline">
           {steps.map((step, index) => {
             const isHovered = hoveredStep === index;
             return (
               <div
                 key={index}
-                className={`workflow-step-card ${isHovered ? 'step-hovered' : ''}`}
+                className={`workflow-card ${isHovered ? 'workflow-card-hovered' : ''}`}
                 onMouseEnter={() => setHoveredStep(index)}
                 onMouseLeave={() => setHoveredStep(null)}
               >
-                {/* Step Connector Line for visual flow */}
-                {index < steps.length - 1 && (
-                  <div className="step-connector-arrow" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--border-color)" strokeWidth="2">
-                      <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
-                )}
-
                 {/* Step Circle Index */}
-                <div className="step-number-badge">
-                  <span>{index + 1}</span>
+                <div className="workflow-num">
+                  {index + 1}
                 </div>
 
                 {/* Step Graphic / Icon */}
-                <div className="step-icon-wrapper">
-                  <span className="step-icon">{step.icon}</span>
-                </div>
+                <div className="workflow-icon">{step.icon}</div>
 
                 {/* Details */}
-                <h3 className="step-title">{step.title}</h3>
-                <p className="step-desc">{step.desc}</p>
+                <div className="workflow-title">{step.title}</div>
+                <div className="workflow-desc">{step.desc}</div>
               </div>
             );
           })}

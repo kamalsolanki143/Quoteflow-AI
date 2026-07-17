@@ -365,13 +365,8 @@ export default function App() {
   const [rejected, setRejected] = useState(false);
   const [approvalTime, setApprovalTime] = useState(null);
   const [rejectionTime, setRejectionTime] = useState(null);
-  const [approvalMessage, setApprovalMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
-  // UI States
-  const [hoveredStep, setHoveredStep] = useState(null);
-  const [isNavOpen, setIsNavOpen] = useState(false);
   
   // Inventory Preview States
   const [inventory, setInventory] = useState([]);
@@ -525,7 +520,6 @@ export default function App() {
         setApproved(true);
         setRejected(false);
         setApprovalTime(res.data.timestamp || new Date().toLocaleString());
-        setApprovalMessage(res.data.message);
         setTimelineStep(0);
         
         // Smooth scroll to results
@@ -558,7 +552,6 @@ export default function App() {
         setApproved(false);
         setRejected(true);
         setRejectionTime(res.data.timestamp || new Date().toLocaleString());
-        setApprovalMessage(res.data.message);
         setTimelineStep(0);
 
         // Smooth scroll to results
@@ -1605,8 +1598,22 @@ export default function App() {
         quoteResult={quoteResult}
         loading={loading}
         approved={approved}
+        rejected={rejected}
         approvalTime={approvalTime}
+        rejectionTime={rejectionTime}
+        managerName={managerName}
+        setManagerName={setManagerName}
+        overrideNotes={overrideNotes}
+        setOverrideNotes={setOverrideNotes}
+        appliedDiscount={appliedDiscount}
+        setAppliedDiscount={setAppliedDiscount}
+        overrideReason={overrideReason}
+        setOverrideReason={setOverrideReason}
+        expectedDelivery={expectedDelivery}
+        setExpectedDelivery={setExpectedDelivery}
         handleApprove={handleApprove}
+        handleReject={handleReject}
+        isSubmittingApproval={isSubmittingApproval}
         fmt={fmt}
         styles={styles}
         palette={palette}

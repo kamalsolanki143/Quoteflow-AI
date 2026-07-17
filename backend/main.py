@@ -18,8 +18,16 @@ Hackathon: FlowZint AI Hackathon 2026
 import json
 import logging
 import os
+import sys
 import uuid
 from datetime import datetime, timezone
+
+# Ensure the parent directory of the current file is in sys.path.
+# This guarantees that 'backend' is resolved as a module/package regardless of
+# whether uvicorn is started from the repository root or from inside the backend directory.
+_base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _base_dir not in sys.path:
+    sys.path.insert(0, _base_dir)
 
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
