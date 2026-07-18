@@ -293,11 +293,49 @@ def clean_nulls(obj: Any) -> Any:
 
 
 def extract_rfq(rfq_text: str) -> dict:
-    
+
     api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
+
     client = genai.Client(
         api_key=api_key
     )
+
+    # Determine the model to use dynamically
+    model_name = "gemini-2.5-flash"
+    try:
+        available_models = [m.name for m in client.models.list()]
+        available_names = [name.replace("models/", "") for name in available_models]
+        
+        # Check if the preferred model is available
+        if "gemini-2.5-flash" in available_names:
+            model_name = "gemini-2.5-flash"
+        elif "gemini-2.5-flash" in available_models:
+            model_name = "gemini-2.5-flash"
+        else:
+            # Pick the newest supported production text model
+            text_models = []
+            for m in client.models.list():
+                name = m.name.replace("models/", "")
+                # We want standard text models: starts with gemini, contains flash or pro
+                # Exclude previews, experimental, tts, image, embedding, search
+                if name.startswith("gemini-") and ("flash" in name or "pro" in name):
+                    if not any(x in name for x in ["preview", "experimental", "tts", "image", "embedding", "search"]):
+                        text_models.append(name)
+            
+            if text_models:
+                # Sort in descending order to get the highest version first
+                text_models.sort(reverse=True)
+                model_name = text_models[0]
+            else:
+                # Fallback to the first available gemini model
+                fallback_models = [name for name in available_names if name.startswith("gemini-")]
+                if fallback_models:
+                    fallback_models.sort(reverse=True)
+                    model_name = fallback_models[0]
+    except Exception as list_err:
+        # If client.models.list() fails, fall back to preferred model
+        print("Failed to list models, using fallback:", list_err)
+        model_name = "gemini-2.5-flash"
 
     generate_content_config = types.GenerateContentConfig(
         temperature=0,
@@ -305,37 +343,37 @@ def extract_rfq(rfq_text: str) -> dict:
             thinking_budget=0,
         ),
         response_mime_type="application/json",
-        response_schema=genai.types.Schema(
-            type=genai.types.Type.OBJECT,
+        response_schema=types.Schema(
+            type=types.Type.OBJECT,
             properties={
-                "customer_name": genai.types.Schema(type=genai.types.Type.STRING),
-                "customer_contact": genai.types.Schema(type=genai.types.Type.STRING),
-                "industry": genai.types.Schema(type=genai.types.Type.STRING),
-                "items": genai.types.Schema(
-                    type=genai.types.Type.ARRAY,
-                    items=genai.types.Schema(
-                        type=genai.types.Type.OBJECT,
+                "customer_name": types.Schema(type=types.Type.STRING),
+                "customer_contact": types.Schema(type=types.Type.STRING),
+                "industry": types.Schema(type=types.Type.STRING),
+                "items": types.Schema(
+                    type=types.Type.ARRAY,
+                    items=types.Schema(
+                        type=types.Type.OBJECT,
                         properties={
-                            "product_name": genai.types.Schema(type=genai.types.Type.STRING),
-                            "quantity": genai.types.Schema(type=genai.types.Type.NUMBER),
-                            "unit": genai.types.Schema(type=genai.types.Type.STRING),
-                            "flags": genai.types.Schema(
-                                type=genai.types.Type.ARRAY,
-                                items=genai.types.Schema(type=genai.types.Type.STRING),
+                            "product_name": types.Schema(type=types.Type.STRING),
+                            "quantity": types.Schema(type=types.Type.NUMBER),
+                            "unit": types.Schema(type=types.Type.STRING),
+                            "flags": types.Schema(
+                                type=types.Type.ARRAY,
+                                items=types.Schema(type=types.Type.STRING),
                             ),
                         },
                     ),
                 ),
-                "delivery_location": genai.types.Schema(type=genai.types.Type.STRING),
-                "delivery_deadline": genai.types.Schema(type=genai.types.Type.STRING),
-                "payment_terms": genai.types.Schema(type=genai.types.Type.STRING),
-                "budget_mentioned": genai.types.Schema(type=genai.types.Type.STRING),
-                "missing_fields": genai.types.Schema(
-                    type=genai.types.Type.ARRAY,
-                    items=genai.types.Schema(type=genai.types.Type.STRING),
+                "delivery_location": types.Schema(type=types.Type.STRING),
+                "delivery_deadline": types.Schema(type=types.Type.STRING),
+                "payment_terms": types.Schema(type=types.Type.STRING),
+                "budget_mentioned": types.Schema(type=types.Type.STRING),
+                "missing_fields": types.Schema(
+                    type=types.Type.ARRAY,
+                    items=types.Schema(type=types.Type.STRING),
                 ),
-                "confidence": genai.types.Schema(type=genai.types.Type.STRING),
-                "notes": genai.types.Schema(type=genai.types.Type.STRING),
+                "confidence": types.Schema(type=types.Type.STRING),
+                "notes": types.Schema(type=types.Type.STRING),
             },
         ),
         system_instruction=SYSTEM_PROMPT,
@@ -343,7 +381,7 @@ def extract_rfq(rfq_text: str) -> dict:
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash-lite",
+            model=model_name,
             contents=rfq_text,
             config=generate_content_config,
         )
