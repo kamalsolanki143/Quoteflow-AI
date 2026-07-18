@@ -306,42 +306,7 @@ def extract_rfq(rfq_text: str) -> dict:
         api_key=api_key
     )
 
-    # Determine the model to use dynamically
-    model_name = MODEL_NAME
-    try:
-        available_models = [m.name for m in client.models.list()]
-        available_names = [name.replace("models/", "") for name in available_models]
-        
-        # Check if the preferred model is available
-        if MODEL_NAME in available_names:
-            model_name = MODEL_NAME
-        elif MODEL_NAME in available_models:
-            model_name = MODEL_NAME
-        else:
-            # Pick the newest supported production text model
-            text_models = []
-            for m in client.models.list():
-                name = m.name.replace("models/", "")
-                # We want standard text models: starts with gemini, contains flash or pro
-                # Exclude previews, experimental, tts, image, embedding, search
-                if name.startswith("gemini-") and ("flash" in name or "pro" in name):
-                    if not any(x in name for x in ["preview", "experimental", "tts", "image", "embedding", "search"]):
-                        text_models.append(name)
-            
-            if text_models:
-                # Sort in descending order to get the highest version first
-                text_models.sort(reverse=True)
-                model_name = text_models[0]
-            else:
-                # Fallback to the first available gemini model
-                fallback_models = [name for name in available_names if name.startswith("gemini-")]
-                if fallback_models:
-                    fallback_models.sort(reverse=True)
-                    model_name = fallback_models[0]
-    except Exception as list_err:
-        # If client.models.list() fails, fall back to preferred model
-        print("Failed to list models, using fallback:", list_err)
-        model_name = MODEL_NAME
+    print("USING MODEL:", MODEL_NAME)
 
     generate_content_config = types.GenerateContentConfig(
         temperature=0,
@@ -387,7 +352,7 @@ def extract_rfq(rfq_text: str) -> dict:
 
     try:
         response = client.models.generate_content(
-            model=model_name,
+            model=MODEL_NAME,
             contents=rfq_text,
             config=generate_content_config,
         )
