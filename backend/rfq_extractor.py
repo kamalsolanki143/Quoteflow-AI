@@ -6,8 +6,14 @@ from google.genai import types
 from dotenv import load_dotenv
 
 load_dotenv()
-print("API KEY FOUND:", bool(os.getenv("GEMINI_API_KEY")))
-print("API KEY PREFIX:", os.getenv("GEMINI_API_KEY", "")[:10])
+_google_key = os.getenv("GOOGLE_API_KEY")
+_gemini_key = os.getenv("GEMINI_API_KEY")
+print("GOOGLE_API_KEY FOUND:", bool(_google_key))
+if _google_key:
+    print("GOOGLE_API_KEY PREFIX:", _google_key[:10])
+print("GEMINI_API_KEY FOUND:", bool(_gemini_key))
+if _gemini_key:
+    print("GEMINI_API_KEY PREFIX:", _gemini_key[:10])
 
 SYSTEM_PROMPT = """You are an AI procurement assistant for an Indian B2B multi-industry 
 distribution company. Your sole job is to extract structured data from 
@@ -288,8 +294,9 @@ def clean_nulls(obj: Any) -> Any:
 
 def extract_rfq(rfq_text: str) -> dict:
     
+    api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
     client = genai.Client(
-        api_key=os.environ.get("GEMINI_API_KEY")
+        api_key=api_key
     )
 
     generate_content_config = types.GenerateContentConfig(
@@ -336,7 +343,7 @@ def extract_rfq(rfq_text: str) -> dict:
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-2.5-flash-lite",
             contents=rfq_text,
             config=generate_content_config,
         )

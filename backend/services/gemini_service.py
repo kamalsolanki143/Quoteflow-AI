@@ -63,7 +63,7 @@ def call_gemini_extractor(rfq_text: str) -> dict:
         logger.error("%s | Gemini API call failed: %s", LOG_ERROR, exc)
         raise RuntimeError(
             f"Gemini API error: {exc}. "
-            "Please check your GEMINI_API_KEY and try again."
+            "Please check your GOOGLE_API_KEY or GEMINI_API_KEY and try again."
         ) from exc
 
     # extract_rfq() returns {"error": "..."} on failure

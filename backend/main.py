@@ -21,6 +21,16 @@ import os
 import sys
 import uuid
 from datetime import datetime, timezone
+from dotenv import load_dotenv
+
+# Load environment variables on application startup.
+# We explicitly load .env from the backend directory and the project root directory
+# to ensure consistent configuration regardless of how the server is run.
+_current_dir = os.path.dirname(os.path.abspath(__file__))
+_root_dir = os.path.dirname(_current_dir)
+load_dotenv(os.path.join(_current_dir, ".env"))
+load_dotenv(os.path.join(_root_dir, ".env"))
+load_dotenv()
 
 # Ensure the parent directory of the current file is in sys.path.
 # This guarantees that 'backend' is resolved as a module/package regardless of
