@@ -15,7 +15,7 @@ print("GEMINI_API_KEY FOUND:", bool(_gemini_key))
 if _gemini_key:
     print("GEMINI_API_KEY PREFIX:", _gemini_key[:10])
 
-MODEL_NAME = "gemini-2.5-flash"
+MODEL_NAME = "gemini-3.5-flash"
 
 SYSTEM_PROMPT = """You are an AI procurement assistant for an Indian B2B multi-industry 
 distribution company. Your sole job is to extract structured data from 
