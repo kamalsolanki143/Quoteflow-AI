@@ -15,6 +15,8 @@ print("GEMINI_API_KEY FOUND:", bool(_gemini_key))
 if _gemini_key:
     print("GEMINI_API_KEY PREFIX:", _gemini_key[:10])
 
+MODEL_NAME = "gemini-2.5-flash"
+
 SYSTEM_PROMPT = """You are an AI procurement assistant for an Indian B2B multi-industry 
 distribution company. Your sole job is to extract structured data from 
 incoming purchase inquiries sent by Indian buyers via WhatsApp, email, 
@@ -293,6 +295,10 @@ def clean_nulls(obj: Any) -> Any:
 
 
 def extract_rfq(rfq_text: str) -> dict:
+    print("="*60)
+    print("USING MODEL:", MODEL_NAME)
+    print("RFQ EXTRACTOR FILE:", __file__)
+    print("="*60)
 
     api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
 
@@ -301,16 +307,16 @@ def extract_rfq(rfq_text: str) -> dict:
     )
 
     # Determine the model to use dynamically
-    model_name = "gemini-2.5-flash"
+    model_name = MODEL_NAME
     try:
         available_models = [m.name for m in client.models.list()]
         available_names = [name.replace("models/", "") for name in available_models]
         
         # Check if the preferred model is available
-        if "gemini-2.5-flash" in available_names:
-            model_name = "gemini-2.5-flash"
-        elif "gemini-2.5-flash" in available_models:
-            model_name = "gemini-2.5-flash"
+        if MODEL_NAME in available_names:
+            model_name = MODEL_NAME
+        elif MODEL_NAME in available_models:
+            model_name = MODEL_NAME
         else:
             # Pick the newest supported production text model
             text_models = []
@@ -335,7 +341,7 @@ def extract_rfq(rfq_text: str) -> dict:
     except Exception as list_err:
         # If client.models.list() fails, fall back to preferred model
         print("Failed to list models, using fallback:", list_err)
-        model_name = "gemini-2.5-flash"
+        model_name = MODEL_NAME
 
     generate_content_config = types.GenerateContentConfig(
         temperature=0,
