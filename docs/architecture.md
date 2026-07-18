@@ -158,7 +158,7 @@ The architecture follows a **three-tier model** — a React frontend, a FastAPI 
 | Aspect        | Detail                                              |
 | ------------- | --------------------------------------------------- |
 | **Provider**  | Google Gemini API                                   |
-| **Model**     | gemini-2.0-flash (planned)                          |
+| **Model**     | gemini-3.5-flash                                    |
 | **Purpose**   | Intelligent extraction of products from RFQ text    |
 
 **Planned capabilities:**
